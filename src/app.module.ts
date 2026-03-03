@@ -11,6 +11,7 @@ import { EquipmentModule } from './equipment/equipment.module';
 import { VenuesModule } from './venues/venues.module';
 import { GigsModule } from './gigs/gigs.module';
 import { CalendarModule } from './calendar/calendar.module';
+import { BpmModule } from './bpm/bpm.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { CalendarModule } from './calendar/calendar.module';
     VenuesModule,
     GigsModule,
     CalendarModule,
+    BpmModule,
   ],
 })
 export class AppModule {}

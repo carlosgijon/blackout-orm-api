@@ -15,8 +15,9 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'http://localhost:4200',  // Angular dev server
-      'tauri://localhost',       // Tauri desktop
-      'https://tauri.localhost', // Tauri Android/iOS
+      'capacitor://localhost',  // Capacitor Android/iOS
+      'https://localhost',      // Capacitor con androidScheme: 'https'
+      'http://localhost',       // Capacitor fallback
     ],
     credentials: true,
   });
