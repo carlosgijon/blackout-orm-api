@@ -38,52 +38,32 @@ const client_1 = require("@prisma/client");
 const bcrypt = __importStar(require("bcrypt"));
 const prisma = new client_1.PrismaClient();
 async function main() {
-    const existing = await prisma.user.findUnique({ where: { username: 'superadmin' } });
-    if (!existing) {
-        const passwordHash = await bcrypt.hash('superadmin123', 10);
-        await prisma.user.create({
-            data: { username: 'superadmin', displayName: 'Super Admin', passwordHash, role: 'superadmin', bandId: null },
-        });
-        console.log('✓ Superadmin created: superadmin / superadmin123');
-    }
-    else {
-        console.log('✓ Superadmin already exists');
-    }
-    let band = await prisma.band.findUnique({ where: { slug: 'blackout' } });
-    if (!band) {
-        band = await prisma.band.create({ data: { name: 'Blackout', slug: 'blackout' } });
-        console.log(`✓ Band created: Blackout (id: ${band.id})`);
-    }
-    else {
-        console.log(`✓ Band already exists: Blackout (id: ${band.id})`);
-    }
-    let admin = await prisma.user.findUnique({ where: { username: 'admin' } });
-    if (!admin) {
-        const passwordHash = await bcrypt.hash('admin123', 10);
-        admin = await prisma.user.create({
-            data: { username: 'admin', displayName: 'Administrador', passwordHash, role: 'admin', bandId: band.id },
-        });
-        console.log(`✓ Admin created: admin / admin123`);
-    }
-    else {
-        if (admin.bandId !== band.id) {
-            await prisma.user.update({ where: { id: admin.id }, data: { bandId: band.id } });
-        }
-        console.log(`✓ Admin already exists`);
-    }
-    const usersWithBand = await prisma.user.findMany({ where: { bandId: { not: null } } });
-    for (const user of usersWithBand) {
-        const exists = await prisma.userBand.findUnique({
-            where: { userId_bandId: { userId: user.id, bandId: user.bandId } },
-        });
-        if (!exists) {
-            await prisma.userBand.create({
-                data: { userId: user.id, bandId: user.bandId, role: user.role },
-            });
-            console.log(`✓ UserBand created for ${user.username} → band ${user.bandId}`);
-        }
-    }
-    console.log('✓ UserBand sync complete');
+    const superHash = await bcrypt.hash('superadmin1234', 10);
+    await prisma.user.upsert({
+        where: { username: 'superadmin' },
+        update: { passwordHash: superHash, role: 'superadmin', displayName: 'Super Admin' },
+        create: { username: 'superadmin', displayName: 'Super Admin', passwordHash: superHash, role: 'superadmin', bandId: null },
+    });
+    console.log('✓ superadmin / superadmin1234');
+    const band = await prisma.band.upsert({
+        where: { slug: 'blackout' },
+        update: {},
+        create: { name: 'Blackout', slug: 'blackout' },
+    });
+    console.log(`✓ Band: Blackout (${band.id})`);
+    const adminHash = await bcrypt.hash('admin123', 10);
+    const admin = await prisma.user.upsert({
+        where: { username: 'admin' },
+        update: { passwordHash: adminHash, role: 'admin', bandId: band.id, displayName: 'Administrador' },
+        create: { username: 'admin', displayName: 'Administrador', passwordHash: adminHash, role: 'admin', bandId: band.id },
+    });
+    console.log(`✓ admin / admin123`);
+    await prisma.userBand.upsert({
+        where: { userId_bandId: { userId: admin.id, bandId: band.id } },
+        update: { role: 'admin' },
+        create: { userId: admin.id, bandId: band.id, role: 'admin' },
+    });
+    console.log('✓ UserBand synced');
 }
 main().catch(console.error).finally(() => prisma.$disconnect());
 //# sourceMappingURL=seed.js.map

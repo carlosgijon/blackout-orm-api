@@ -36,6 +36,12 @@ let MerchController = class MerchController {
     remove(user, id) {
         return this.merch.remove(user.bandId, id);
     }
+    sell(user, id, dto) {
+        return this.merch.sell(user.bandId, id, dto);
+    }
+    restock(user, id, dto) {
+        return this.merch.restock(user.bandId, id, dto);
+    }
 };
 exports.MerchController = MerchController;
 __decorate([
@@ -70,6 +76,24 @@ __decorate([
     __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", void 0)
 ], MerchController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Post)(':id/sell'),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, Object]),
+    __metadata("design:returntype", void 0)
+], MerchController.prototype, "sell", null);
+__decorate([
+    (0, common_1.Put)(':id/stock'),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
+    __param(1, (0, common_1.Param)('id')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, Object]),
+    __metadata("design:returntype", void 0)
+], MerchController.prototype, "restock", null);
 exports.MerchController = MerchController = __decorate([
     (0, swagger_1.ApiTags)('merch'),
     (0, swagger_1.ApiBearerAuth)('JWT'),

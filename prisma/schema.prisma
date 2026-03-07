@@ -419,6 +419,9 @@ model MerchItem {
   batchSize      Int      @default(50) @map("batch_size")
   sellingPrice   Float    @map("selling_price")
   fixedCosts     Float    @default(0) @map("fixed_costs")
+  stock          Int      @default(0)
+  hasSizes       Boolean  @default(false) @map("has_sizes")
+  stockSizes     Json?    @map("stock_sizes")   // {"XS":0,"S":5,"M":10,"L":8,"XL":3,"XXL":1}
   notes          String?
   createdAt      DateTime @default(now()) @map("created_at")
 

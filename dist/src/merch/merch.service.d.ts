@@ -11,6 +11,9 @@ export declare class MerchService {
         batchSize: any;
         sellingPrice: any;
         fixedCosts: any;
+        stock: any;
+        hasSizes: any;
+        stockSizes: Record<string, number> | undefined;
         notes: any;
         createdAt: any;
     }[]>;
@@ -22,6 +25,9 @@ export declare class MerchService {
         batchSize: any;
         sellingPrice: any;
         fixedCosts: any;
+        stock: any;
+        hasSizes: any;
+        stockSizes: Record<string, number> | undefined;
         notes: any;
         createdAt: any;
     }>;
@@ -33,8 +39,59 @@ export declare class MerchService {
         batchSize: any;
         sellingPrice: any;
         fixedCosts: any;
+        stock: any;
+        hasSizes: any;
+        stockSizes: Record<string, number> | undefined;
         notes: any;
         createdAt: any;
     }>;
     remove(bandId: string, id: string): Promise<void>;
+    restock(bandId: string, id: string, dto: {
+        stock?: number;
+        stockSizes?: Record<string, number>;
+    }): Promise<{
+        id: any;
+        name: any;
+        type: any;
+        productionCost: any;
+        batchSize: any;
+        sellingPrice: any;
+        fixedCosts: any;
+        stock: any;
+        hasSizes: any;
+        stockSizes: Record<string, number> | undefined;
+        notes: any;
+        createdAt: any;
+    }>;
+    sell(bandId: string, id: string, dto: {
+        quantity: number;
+        unitPrice: number;
+        date: string;
+        size?: string;
+        notes?: string;
+    }): Promise<{
+        item: {
+            id: any;
+            name: any;
+            type: any;
+            productionCost: any;
+            batchSize: any;
+            sellingPrice: any;
+            fixedCosts: any;
+            stock: any;
+            hasSizes: any;
+            stockSizes: Record<string, number> | undefined;
+            notes: any;
+            createdAt: any;
+        };
+        transaction: {
+            id: string;
+            type: string;
+            category: string;
+            amount: number;
+            date: string;
+            description: string | null;
+            createdAt: string;
+        };
+    }>;
 }

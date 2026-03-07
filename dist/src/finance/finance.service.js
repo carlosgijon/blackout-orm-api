@@ -89,12 +89,28 @@ let FinanceService = class FinanceService {
         return toWishListItem(w);
     }
     async updateWishListItem(bandId, id, dto) {
-        await this.#findOwnedWishItem(bandId, id);
-        const { id: _id, createdAt: _ca, bandId: _bid, ...data } = dto;
-        const w = await this.prisma.wishListItem.update({
-            where: { id },
-            data,
-        });
+        const existing = await this.#findOwnedWishItem(bandId, id);
+        const { id: _id, createdAt: _ca, bandId: _bid, finalPrice, ...data } = dto;
+        const w = await this.prisma.wishListItem.update({ where: { id }, data });
+        if (!existing.purchased && data.purchased === true) {
+            const amount = finalPrice ?? existing.estimatedPrice;
+            if (amount && amount > 0) {
+                const categoryMap = {
+                    instrument: 'equipment', equipment: 'equipment',
+                    merch: 'merch_production', studio: 'recording', other: 'other',
+                };
+                await this.prisma.transaction.create({
+                    data: {
+                        bandId,
+                        type: 'expense',
+                        category: categoryMap[existing.category] ?? 'other',
+                        amount,
+                        date: new Date().toISOString().slice(0, 10),
+                        description: `Lista de deseos: ${existing.name}`,
+                    },
+                });
+            }
+        }
         return toWishListItem(w);
     }
     async removeWishListItem(bandId, id) {

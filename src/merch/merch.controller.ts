@@ -31,4 +31,14 @@ export class MerchController {
   remove(@CurrentUser() user: any, @Param('id') id: string) {
     return this.merch.remove(user.bandId, id);
   }
+
+  @Post(':id/sell')
+  sell(@CurrentUser() user: any, @Param('id') id: string, @Body() dto: any) {
+    return this.merch.sell(user.bandId, id, dto);
+  }
+
+  @Put(':id/stock')
+  restock(@CurrentUser() user: any, @Param('id') id: string, @Body() dto: any) {
+    return this.merch.restock(user.bandId, id, dto);
+  }
 }

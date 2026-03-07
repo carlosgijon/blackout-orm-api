@@ -89,12 +89,31 @@ export class FinanceService {
   }
 
   async updateWishListItem(bandId: string, id: string, dto: any) {
-    await this.#findOwnedWishItem(bandId, id);
-    const { id: _id, createdAt: _ca, bandId: _bid, ...data } = dto;
-    const w = await this.prisma.wishListItem.update({
-      where: { id },
-      data,
-    });
+    const existing = await this.#findOwnedWishItem(bandId, id);
+    const { id: _id, createdAt: _ca, bandId: _bid, finalPrice, ...data } = dto;
+    const w = await this.prisma.wishListItem.update({ where: { id }, data });
+
+    // Auto-create expense when item is marked as purchased for the first time
+    if (!existing.purchased && data.purchased === true) {
+      const amount = finalPrice ?? existing.estimatedPrice;
+      if (amount && amount > 0) {
+        const categoryMap: Record<string, string> = {
+          instrument: 'equipment', equipment: 'equipment',
+          merch: 'merch_production', studio: 'recording', other: 'other',
+        };
+        await this.prisma.transaction.create({
+          data: {
+            bandId,
+            type: 'expense',
+            category: categoryMap[existing.category] ?? 'other',
+            amount,
+            date: new Date().toISOString().slice(0, 10),
+            description: `Lista de deseos: ${existing.name}`,
+          },
+        });
+      }
+    }
+
     return toWishListItem(w);
   }
 
