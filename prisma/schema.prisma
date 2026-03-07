@@ -29,6 +29,9 @@ model Band {
   venues         Venue[]
   gigs           Gig[]
   calendarEvents CalendarEvent[]
+  transactions   Transaction[]
+  wishListItems  WishListItem[]
+  merchItems     MerchItem[]
 
   @@map("bands")
 }
@@ -291,11 +294,12 @@ model Gig {
   followUpNote   String?  @map("follow_up_note")
   createdAt      DateTime @default(now()) @map("created_at")
 
-  band       Band           @relation(fields: [bandId], references: [id], onDelete: Cascade)
-  venue      Venue?         @relation(fields: [venueId], references: [id], onDelete: SetNull)
-  setlist    Playlist?      @relation(fields: [setlistId], references: [id], onDelete: SetNull)
-  contacts   GigContact[]
-  checklists GigChecklist[]
+  band         Band           @relation(fields: [bandId], references: [id], onDelete: Cascade)
+  venue        Venue?         @relation(fields: [venueId], references: [id], onDelete: SetNull)
+  setlist      Playlist?      @relation(fields: [setlistId], references: [id], onDelete: SetNull)
+  contacts     GigContact[]
+  checklists   GigChecklist[]
+  transactions Transaction[]
 
   @@map("gigs")
 }
@@ -361,4 +365,64 @@ model ChecklistItem {
   checklist GigChecklist @relation(fields: [checklistId], references: [id], onDelete: Cascade)
 
   @@map("checklist_items")
+}
+
+// ── Finance ─────────────────────────────────────────────────────────────────
+
+model Transaction {
+  id          String   @id @default(uuid())
+  bandId      String   @map("band_id")
+  // "income" | "expense"
+  type        String
+  // income: "gig"|"merch_sales"|"streaming"|"teaching"|"sponsorship"|"other"
+  // expense: "equipment"|"travel"|"accommodation"|"recording"|"marketing"|"rehearsal"|"merch_production"|"venue"|"other"
+  category    String
+  amount      Float
+  date        String   // YYYY-MM-DD
+  description String?
+  gigId       String?  @map("gig_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  band Band @relation(fields: [bandId], references: [id], onDelete: Cascade)
+  gig  Gig? @relation(fields: [gigId], references: [id], onDelete: SetNull)
+
+  @@map("transactions")
+}
+
+model WishListItem {
+  id             String   @id @default(uuid())
+  bandId         String   @map("band_id")
+  name           String
+  // "instrument"|"equipment"|"merch"|"studio"|"other"
+  category       String
+  estimatedPrice Float?   @map("estimated_price")
+  // "low"|"medium"|"high"
+  priority       String   @default("medium")
+  notes          String?
+  purchased      Boolean  @default(false)
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  band Band @relation(fields: [bandId], references: [id], onDelete: Cascade)
+
+  @@map("wish_list_items")
+}
+
+// ── Merch ────────────────────────────────────────────────────────────────────
+
+model MerchItem {
+  id             String   @id @default(uuid())
+  bandId         String   @map("band_id")
+  name           String
+  // "t-shirt"|"hoodie"|"vinyl"|"cd"|"poster"|"sticker"|"hat"|"patch"|"other"
+  type           String
+  productionCost Float    @map("production_cost")
+  batchSize      Int      @default(50) @map("batch_size")
+  sellingPrice   Float    @map("selling_price")
+  fixedCosts     Float    @default(0) @map("fixed_costs")
+  notes          String?
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  band Band @relation(fields: [bandId], references: [id], onDelete: Cascade)
+
+  @@map("merch_items")
 }

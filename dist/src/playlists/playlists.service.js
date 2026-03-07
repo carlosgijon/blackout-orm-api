@@ -44,7 +44,6 @@ let PlaylistsService = class PlaylistsService {
         const playlists = await this.prisma.playlist.findMany({
             where: { bandId },
             orderBy: { createdAt: 'desc' },
-            include: { _count: { select: { songs: true } } },
         });
         const withDurations = await Promise.all(playlists.map(async (p) => {
             const songs = await this.prisma.playlistSong.findMany({
@@ -52,12 +51,13 @@ let PlaylistsService = class PlaylistsService {
                 include: { song: { select: { duration: true } } },
             });
             const totalDuration = songs.reduce((acc, s) => acc + (s.song?.duration ?? 0), 0);
+            const songCount = songs.filter(s => s.type === 'song').length;
             return {
                 id: p.id,
                 name: p.name,
                 description: p.description ?? undefined,
                 createdAt: p.createdAt.toISOString(),
-                songCount: p._count.songs,
+                songCount,
                 totalDuration,
             };
         }));

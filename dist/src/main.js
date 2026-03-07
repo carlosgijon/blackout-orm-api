@@ -11,8 +11,9 @@ async function bootstrap() {
     app.enableCors({
         origin: [
             'http://localhost:4200',
-            'tauri://localhost',
-            'https://tauri.localhost',
+            'capacitor://localhost',
+            'https://localhost',
+            'http://localhost',
         ],
         credentials: true,
     });

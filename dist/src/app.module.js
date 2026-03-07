@@ -20,6 +20,9 @@ const equipment_module_1 = require("./equipment/equipment.module");
 const venues_module_1 = require("./venues/venues.module");
 const gigs_module_1 = require("./gigs/gigs.module");
 const calendar_module_1 = require("./calendar/calendar.module");
+const bpm_module_1 = require("./bpm/bpm.module");
+const finance_module_1 = require("./finance/finance.module");
+const merch_module_1 = require("./merch/merch.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -38,6 +41,9 @@ exports.AppModule = AppModule = __decorate([
             venues_module_1.VenuesModule,
             gigs_module_1.GigsModule,
             calendar_module_1.CalendarModule,
+            bpm_module_1.BpmModule,
+            finance_module_1.FinanceModule,
+            merch_module_1.MerchModule,
         ],
     })
 ], AppModule);

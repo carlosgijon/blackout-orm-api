@@ -7,8 +7,8 @@ export declare class AmplifiersService {
         id: string;
         bandId: string;
         name: string;
-        type: string;
         notes: string | null;
+        type: string;
         stagePosition: string | null;
         brand: string | null;
         model: string | null;
@@ -25,8 +25,8 @@ export declare class AmplifiersService {
         id: string;
         bandId: string;
         name: string;
-        type: string;
         notes: string | null;
+        type: string;
         stagePosition: string | null;
         brand: string | null;
         model: string | null;
@@ -43,8 +43,8 @@ export declare class AmplifiersService {
         id: string;
         bandId: string;
         name: string;
-        type: string;
         notes: string | null;
+        type: string;
         stagePosition: string | null;
         brand: string | null;
         model: string | null;

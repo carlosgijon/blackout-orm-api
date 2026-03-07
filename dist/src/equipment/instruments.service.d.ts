@@ -7,8 +7,8 @@ export declare class InstrumentsService {
         id: string;
         bandId: string;
         name: string;
-        type: string;
         notes: string | null;
+        type: string;
         brand: string | null;
         model: string | null;
         monoStereo: string | null;
@@ -21,8 +21,8 @@ export declare class InstrumentsService {
         id: string;
         bandId: string;
         name: string;
-        type: string;
         notes: string | null;
+        type: string;
         brand: string | null;
         model: string | null;
         monoStereo: string | null;
@@ -35,8 +35,8 @@ export declare class InstrumentsService {
         id: string;
         bandId: string;
         name: string;
-        type: string;
         notes: string | null;
+        type: string;
         brand: string | null;
         model: string | null;
         monoStereo: string | null;

@@ -12,6 +12,8 @@ import { VenuesModule } from './venues/venues.module';
 import { GigsModule } from './gigs/gigs.module';
 import { CalendarModule } from './calendar/calendar.module';
 import { BpmModule } from './bpm/bpm.module';
+import { FinanceModule } from './finance/finance.module';
+import { MerchModule } from './merch/merch.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { BpmModule } from './bpm/bpm.module';
     GigsModule,
     CalendarModule,
     BpmModule,
+    FinanceModule,
+    MerchModule,
   ],
 })
 export class AppModule {}
