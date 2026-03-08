@@ -12,7 +12,7 @@ interface SongInput {
   duration?: number;
 }
 
-interface SetlistResult {
+export interface SetlistResult {
   orderedIds: string[];
   explanation: string;
 }
