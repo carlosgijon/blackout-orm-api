@@ -14,6 +14,8 @@ interface SongInput {
 
 export interface SetlistResult {
   orderedIds: string[];
+  joinAfter: string[];       // IDs of songs that should be joined (no pause) with the next song
+  bisAfterSongId: string | null; // ID of the song after which to insert the BIS marker (null = no bis)
   explanation: string;
 }
 
@@ -44,10 +46,23 @@ CRITERIOS PARA ORDENAR:
 - Coherencia de tempo: evitar saltos bruscos de BPM (máx. 30 BPM de diferencia entre canciones adyacentes si es posible)
 - Si hay preferencias del usuario, priorizarlas
 
+ENCADENAR CANCIONES (joinAfter):
+- Identifica pares o grupos de canciones que fluyan directamente sin pausa (misma tonalidad o muy cercana, BPM compatible).
+- Devuelve en "joinAfter" el ID de cada canción que debe ir encadenada a la siguiente (sin pausa entre ellas).
+- Solo encadena canciones cuando sea musicalmente natural. No fuerces encadenamientos.
+
+BIS:
+- Si el setlist tiene 4 o más canciones, decide cuál es la canción tras la que se hace el corte del BIS (el público pensará que ha terminado, y la banda vuelve para el bis).
+- El bis debe ser el momento más intenso o emotivo. Suele ser entre las últimas 2 y 4 canciones.
+- Devuelve en "bisAfterSongId" el ID de la canción justo ANTES del bis (es decir, la última canción del bloque principal).
+- Si el setlist es muy corto (menos de 4 canciones) o no tiene sentido un bis, devuelve null.
+
 RESPONDE ÚNICAMENTE con un objeto JSON válido con esta estructura exacta (sin texto adicional):
 {
   "orderedIds": ["id1", "id2", "id3", ...],
-  "explanation": "Explicación breve en español de por qué este orden funciona bien (máx. 3 frases)"
+  "joinAfter": ["id2", "id5"],
+  "bisAfterSongId": "id8",
+  "explanation": "Explicación breve en español de por qué este orden funciona bien y qué canciones se encadenan (máx. 4 frases)"
 }`;
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -60,7 +75,7 @@ RESPONDE ÚNICAMENTE con un objeto JSON válido con esta estructura exacta (sin 
         model: 'llama-3.3-70b-versatile',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.4,
-        max_tokens: 800,
+        max_tokens: 1200,
         response_format: { type: 'json_object' },
       }),
     });
@@ -77,6 +92,8 @@ RESPONDE ÚNICAMENTE con un objeto JSON válido con esta estructura exacta (sin 
     try {
       const parsed = JSON.parse(content) as SetlistResult;
       if (!Array.isArray(parsed.orderedIds)) throw new Error('orderedIds inválido');
+      parsed.joinAfter = Array.isArray(parsed.joinAfter) ? parsed.joinAfter : [];
+      parsed.bisAfterSongId = parsed.bisAfterSongId ?? null;
       return parsed;
     } catch {
       throw new BadRequestException('La IA devolvió un formato inesperado');
