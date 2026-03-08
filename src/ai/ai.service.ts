@@ -1,4 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
+import { GROQ_API_KEY } from '../config/api-keys';
 
 interface SongInput {
   id: string;
@@ -21,9 +22,8 @@ export class AiService {
   async generateSetlist(
     songs: SongInput[],
     preferences: string,
-    groqApiKey: string,
   ): Promise<SetlistResult> {
-    if (!groqApiKey) throw new BadRequestException('Groq API key not configured');
+    const groqApiKey = GROQ_API_KEY;
     if (songs.length < 2) throw new BadRequestException('Se necesitan al menos 2 canciones');
 
     const songList = songs.map((s, i) =>
