@@ -52,8 +52,42 @@ export class GigsService {
   }
 
   async updateStatus(bandId: string, id: string, status: string) {
-    await this.#findOwned(bandId, id);
-    const g = await this.prisma.gig.update({ where: { id }, data: { status }, include: GIG_INCLUDE });
+    const prev = await this.#findOwned(bandId, id);
+
+    const updateData: any = { status };
+
+    // When a gig is marked as played, auto-set followUpDate to 1st of next month
+    if (status === 'played' && prev.status !== 'played') {
+      const now = new Date();
+      const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      updateData.followUpDate = nextMonth.toISOString().slice(0, 10);
+      updateData.followUpNote = 'Recordatorio: cobrar este concierto';
+    }
+
+    const g = await this.prisma.gig.update({ where: { id }, data: updateData, include: GIG_INCLUDE });
+
+    // When marked as cobrado, auto-create an income transaction from the pay field
+    if (status === 'cobrado' && prev.status !== 'cobrado') {
+      const rawPay = prev.pay ?? '';
+      const amount = parseFloat(rawPay.replace(/[^0-9.,]/g, '').replace(',', '.'));
+      if (!isNaN(amount) && amount > 0) {
+        const today = new Date().toISOString().slice(0, 10);
+        await this.prisma.transaction.create({
+          data: {
+            bandId,
+            gigId: id,
+            type: 'income',
+            category: 'gig',
+            amount,
+            date: today,
+            description: `Cobro: ${prev.title}`,
+          },
+        });
+      }
+      // Clear the reminder once paid
+      await this.prisma.gig.update({ where: { id }, data: { followUpDate: null, followUpNote: null } });
+    }
+
     return toGig(g);
   }
 
