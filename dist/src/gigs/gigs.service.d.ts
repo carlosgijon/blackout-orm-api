@@ -17,6 +17,7 @@ export declare class GigsService {
         soundcheckTime: any;
         setTime: any;
         notes: any;
+        attendance: any;
         followUpDate: any;
         followUpNote: any;
         createdAt: any;
@@ -35,6 +36,7 @@ export declare class GigsService {
         soundcheckTime: any;
         setTime: any;
         notes: any;
+        attendance: any;
         followUpDate: any;
         followUpNote: any;
         createdAt: any;
@@ -53,6 +55,7 @@ export declare class GigsService {
         soundcheckTime: any;
         setTime: any;
         notes: any;
+        attendance: any;
         followUpDate: any;
         followUpNote: any;
         createdAt: any;
@@ -71,6 +74,7 @@ export declare class GigsService {
         soundcheckTime: any;
         setTime: any;
         notes: any;
+        attendance: any;
         followUpDate: any;
         followUpNote: any;
         createdAt: any;
@@ -83,16 +87,16 @@ export declare class GigsService {
     getContacts(bandId: string, gigId: string): Promise<{
         createdAt: string;
         id: string;
-        notes: string | null;
         date: string;
+        notes: string | null;
         gigId: string;
         contactType: string;
     }[]>;
     createContact(bandId: string, gigId: string, dto: any): Promise<{
         createdAt: string;
         id: string;
-        notes: string | null;
         date: string;
+        notes: string | null;
         gigId: string;
         contactType: string;
     }>;
@@ -114,31 +118,69 @@ export declare class GigsService {
     removeChecklist(bandId: string, gigId: string, checklistId: string): Promise<void>;
     getItems(bandId: string, checklistId: string): Promise<{
         id: string;
-        sortOrder: number;
-        category: string;
         checklistId: string;
+        category: string;
         text: string;
         done: boolean;
+        sortOrder: number;
     }[]>;
     createItem(bandId: string, checklistId: string, dto: any): Promise<{
         id: string;
-        sortOrder: number;
-        category: string;
         checklistId: string;
+        category: string;
         text: string;
         done: boolean;
+        sortOrder: number;
     }>;
     updateItem(bandId: string, checklistId: string, itemId: string, dto: any): Promise<{
         id: string;
-        sortOrder: number;
-        category: string;
         checklistId: string;
+        category: string;
         text: string;
         done: boolean;
+        sortOrder: number;
     }>;
     removeItem(bandId: string, checklistId: string, itemId: string): Promise<void>;
     resetItems(bandId: string, checklistId: string): Promise<void>;
     removeContactById(bandId: string, contactId: string): Promise<void>;
     removeChecklistById(bandId: string, checklistId: string): Promise<void>;
     removeItemById(bandId: string, itemId: string): Promise<void>;
+    getSummary(bandId: string, gigId: string): Promise<{
+        gig: {
+            id: any;
+            venueId: any;
+            venueName: any;
+            setlistId: any;
+            title: any;
+            date: any;
+            time: any;
+            status: any;
+            pay: any;
+            loadInTime: any;
+            soundcheckTime: any;
+            setTime: any;
+            notes: any;
+            attendance: any;
+            followUpDate: any;
+            followUpNote: any;
+            createdAt: any;
+        };
+        transactions: {
+            id: string;
+            type: string;
+            category: string;
+            amount: number;
+            date: string;
+            description: string | undefined;
+            gigId: string | undefined;
+            createdAt: string;
+        }[];
+        merchSales: {
+            id: string;
+            amount: number;
+            date: string;
+            description: string | undefined;
+            createdAt: string;
+        }[];
+    }>;
 }

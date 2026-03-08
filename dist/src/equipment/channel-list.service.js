@@ -43,20 +43,43 @@ let ChannelListService = class ChannelListService {
                 });
             }
         }
+        const drumUsageLabel = {
+            'drums-kick': 'Bombo',
+            'drums-overhead': 'Aéreos',
+            'drums-snare': 'Caja',
+        };
         for (const inst of instruments) {
             const memberName = inst.memberId ? memberMap.get(inst.memberId)?.name : undefined;
-            const assignedMic = mics.find(m => m.assignedToId === inst.id && m.assignedToType === 'instrument');
-            channels.push({
-                channelNumber: ch++,
-                name: memberName ? `${memberName} – ${inst.name}` : inst.name,
-                monoStereo: inst.monoStereo ?? 'mono',
-                phantomPower: assignedMic?.phantomPower ?? false,
-                micModel: assignedMic ? `${assignedMic.brand ?? ''} ${assignedMic.model ?? ''}`.trim() || assignedMic.name : undefined,
-                micType: assignedMic?.type,
-                polarPattern: assignedMic?.polarPattern ?? undefined,
-                notes: inst.notes ?? undefined,
-                memberId: inst.memberId ?? undefined,
-            });
+            const instMics = mics.filter(m => m.assignedToId === inst.id && m.assignedToType === 'instrument');
+            if (instMics.length === 0) {
+                channels.push({
+                    channelNumber: ch++,
+                    name: memberName ? `${memberName} – ${inst.name}` : inst.name,
+                    monoStereo: inst.monoStereo ?? 'mono',
+                    phantomPower: false,
+                    notes: inst.notes ?? undefined,
+                    memberId: inst.memberId ?? undefined,
+                });
+            }
+            else {
+                for (const mic of instMics) {
+                    const suffix = instMics.length > 1
+                        ? (drumUsageLabel[mic.usage ?? ''] ?? inst.name)
+                        : inst.name;
+                    const name = memberName ? `${memberName} – ${suffix}` : suffix;
+                    channels.push({
+                        channelNumber: ch++,
+                        name,
+                        monoStereo: mic.monoStereo ?? 'mono',
+                        phantomPower: mic.phantomPower ?? false,
+                        micModel: `${mic.brand ?? ''} ${mic.model ?? ''}`.trim() || mic.name,
+                        micType: mic.type,
+                        polarPattern: mic.polarPattern ?? undefined,
+                        notes: inst.notes ?? undefined,
+                        memberId: inst.memberId ?? undefined,
+                    });
+                }
+            }
         }
         return channels;
     }

@@ -16,10 +16,49 @@ export declare class GigsController {
         soundcheckTime: any;
         setTime: any;
         notes: any;
+        attendance: any;
         followUpDate: any;
         followUpNote: any;
         createdAt: any;
     }[]>;
+    getSummary(user: any, id: string): Promise<{
+        gig: {
+            id: any;
+            venueId: any;
+            venueName: any;
+            setlistId: any;
+            title: any;
+            date: any;
+            time: any;
+            status: any;
+            pay: any;
+            loadInTime: any;
+            soundcheckTime: any;
+            setTime: any;
+            notes: any;
+            attendance: any;
+            followUpDate: any;
+            followUpNote: any;
+            createdAt: any;
+        };
+        transactions: {
+            id: string;
+            type: string;
+            category: string;
+            amount: number;
+            date: string;
+            description: string | undefined;
+            gigId: string | undefined;
+            createdAt: string;
+        }[];
+        merchSales: {
+            id: string;
+            amount: number;
+            date: string;
+            description: string | undefined;
+            createdAt: string;
+        }[];
+    }>;
     create(user: any, dto: any): Promise<{
         id: any;
         venueId: any;
@@ -34,6 +73,7 @@ export declare class GigsController {
         soundcheckTime: any;
         setTime: any;
         notes: any;
+        attendance: any;
         followUpDate: any;
         followUpNote: any;
         createdAt: any;
@@ -52,6 +92,7 @@ export declare class GigsController {
         soundcheckTime: any;
         setTime: any;
         notes: any;
+        attendance: any;
         followUpDate: any;
         followUpNote: any;
         createdAt: any;
@@ -72,6 +113,7 @@ export declare class GigsController {
         soundcheckTime: any;
         setTime: any;
         notes: any;
+        attendance: any;
         followUpDate: any;
         followUpNote: any;
         createdAt: any;
@@ -81,16 +123,16 @@ export declare class GigsController {
     getContacts(user: any, gigId: string): Promise<{
         createdAt: string;
         id: string;
-        notes: string | null;
         date: string;
+        notes: string | null;
         gigId: string;
         contactType: string;
     }[]>;
     createContact(user: any, gigId: string, dto: any): Promise<{
         createdAt: string;
         id: string;
-        notes: string | null;
         date: string;
+        notes: string | null;
         gigId: string;
         contactType: string;
     }>;
@@ -112,27 +154,27 @@ export declare class GigsController {
     removeChecklist(user: any, gigId: string, checklistId: string): Promise<void>;
     getItems(user: any, checklistId: string): Promise<{
         id: string;
-        sortOrder: number;
         category: string;
         checklistId: string;
         text: string;
         done: boolean;
+        sortOrder: number;
     }[]>;
     createItem(user: any, checklistId: string, dto: any): Promise<{
         id: string;
-        sortOrder: number;
         category: string;
         checklistId: string;
         text: string;
         done: boolean;
+        sortOrder: number;
     }>;
     updateItem(user: any, checklistId: string, itemId: string, dto: any): Promise<{
         id: string;
-        sortOrder: number;
         category: string;
         checklistId: string;
         text: string;
         done: boolean;
+        sortOrder: number;
     }>;
     removeItem(user: any, checklistId: string, itemId: string): Promise<void>;
     resetItems(user: any, checklistId: string): Promise<void>;

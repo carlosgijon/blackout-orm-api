@@ -69,6 +69,7 @@ export declare class MerchService {
         date: string;
         size?: string;
         notes?: string;
+        gigId?: string;
     }): Promise<{
         item: {
             id: any;

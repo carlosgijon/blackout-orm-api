@@ -25,6 +25,9 @@ let GigsController = class GigsController {
         this.gigs = gigs;
     }
     findAll(user) { return this.gigs.findAll(user.bandId); }
+    getSummary(user, id) {
+        return this.gigs.getSummary(user.bandId, id);
+    }
     create(user, dto) { return this.gigs.create(user.bandId, dto); }
     update(user, id, dto) {
         return this.gigs.update(user.bandId, id, dto);
@@ -87,6 +90,14 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], GigsController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)(':id/summary'),
+    __param(0, (0, current_user_decorator_1.CurrentUser)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", void 0)
+], GigsController.prototype, "getSummary", null);
 __decorate([
     (0, common_1.Post)(),
     __param(0, (0, current_user_decorator_1.CurrentUser)()),

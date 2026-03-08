@@ -23,6 +23,7 @@ const calendar_module_1 = require("./calendar/calendar.module");
 const bpm_module_1 = require("./bpm/bpm.module");
 const finance_module_1 = require("./finance/finance.module");
 const merch_module_1 = require("./merch/merch.module");
+const ai_module_1 = require("./ai/ai.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -44,6 +45,7 @@ exports.AppModule = AppModule = __decorate([
             bpm_module_1.BpmModule,
             finance_module_1.FinanceModule,
             merch_module_1.MerchModule,
+            ai_module_1.AiModule,
         ],
     })
 ], AppModule);

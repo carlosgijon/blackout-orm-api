@@ -12,6 +12,8 @@ export declare class LibraryController {
         tempo: number | null;
         style: string | null;
         notes: string | null;
+        startNote: string | null;
+        endNote: string | null;
     }[]>;
     create(user: any, dto: any): import(".prisma/client").Prisma.Prisma__LibrarySongClient<{
         id: string;
@@ -23,6 +25,8 @@ export declare class LibraryController {
         tempo: number | null;
         style: string | null;
         notes: string | null;
+        startNote: string | null;
+        endNote: string | null;
     }, never, import("@prisma/client/runtime/library").DefaultArgs>;
     update(user: any, id: string, dto: any): Promise<{
         id: string;
@@ -34,6 +38,8 @@ export declare class LibraryController {
         tempo: number | null;
         style: string | null;
         notes: string | null;
+        startNote: string | null;
+        endNote: string | null;
     }>;
     remove(user: any, id: string): Promise<void>;
     getUsage(user: any, id: string): Promise<string[]>;

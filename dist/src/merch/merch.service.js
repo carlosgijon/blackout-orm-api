@@ -112,6 +112,7 @@ let MerchService = class MerchService {
                     amount: totalAmount,
                     date: dto.date,
                     description: `Venta merch: ${dto.quantity}× ${item.name}${sizeLabel} @ ${dto.unitPrice}€${dto.notes ? ` — ${dto.notes}` : ''}`,
+                    gigId: dto.gigId ?? null,
                 },
             }),
         ]);
