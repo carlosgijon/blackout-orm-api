@@ -85,15 +85,17 @@ model Setting {
 // ── Songs & Playlists ───────────────────────────────────────────────────────
 
 model LibrarySong {
-  id       String  @id @default(uuid())
-  bandId   String  @map("band_id")
-  title    String
-  artist   String
-  album    String?
-  duration Int?    // seconds
-  tempo    Int?    // BPM
-  style    String?
-  notes    String?
+  id        String  @id @default(uuid())
+  bandId    String  @map("band_id")
+  title     String
+  artist    String
+  album     String?
+  duration  Int?    // seconds
+  tempo     Int?    // BPM
+  style     String?
+  notes     String?
+  startNote String? @map("start_note") // e.g. "Em", "A#"
+  endNote   String? @map("end_note")   // e.g. "G", "Db"
 
   band          Band           @relation(fields: [bandId], references: [id], onDelete: Cascade)
   playlistSongs PlaylistSong[]
@@ -290,6 +292,7 @@ model Gig {
   soundcheckTime String?  @map("soundcheck_time")
   setTime        String?  @map("set_time")
   notes          String?
+  attendance     Int?
   followUpDate   String?  @map("follow_up_date")
   followUpNote   String?  @map("follow_up_note")
   createdAt      DateTime @default(now()) @map("created_at")

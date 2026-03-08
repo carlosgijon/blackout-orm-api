@@ -16,6 +16,7 @@ function toGig(g: any) {
     soundcheckTime: g.soundcheckTime ?? undefined,
     setTime: g.setTime ?? undefined,
     notes: g.notes ?? undefined,
+    attendance: g.attendance ?? undefined,
     followUpDate: g.followUpDate ?? undefined,
     followUpNote: g.followUpNote ?? undefined,
     createdAt: g.createdAt.toISOString(),
@@ -186,6 +187,31 @@ export class GigsService {
     });
     if (!item) throw new NotFoundException('Checklist item not found');
     await this.prisma.checklistItem.delete({ where: { id: itemId } });
+  }
+
+  async getSummary(bandId: string, gigId: string) {
+    const gig = await this.#findOwned(bandId, gigId);
+
+    const transactions = await this.prisma.transaction.findMany({
+      where: { gigId, bandId },
+      orderBy: { date: 'desc' },
+    });
+
+    // Merch sales are transactions with category='merch_sales' linked to this gig
+    const merchSales = transactions.filter(t => t.category === 'merch_sales');
+
+    return {
+      gig: toGig({ ...gig, venue: gig.venueId ? await this.prisma.venue.findUnique({ where: { id: gig.venueId } }) : null }),
+      transactions: transactions.map(t => ({
+        id: t.id, type: t.type, category: t.category, amount: t.amount,
+        date: t.date, description: t.description ?? undefined,
+        gigId: t.gigId ?? undefined, createdAt: t.createdAt.toISOString(),
+      })),
+      merchSales: merchSales.map(t => ({
+        id: t.id, amount: t.amount, date: t.date,
+        description: t.description ?? undefined, createdAt: t.createdAt.toISOString(),
+      })),
+    };
   }
 
   async #findOwned(bandId: string, id: string) {

@@ -17,6 +17,11 @@ export class GigsController {
   @Get()
   findAll(@CurrentUser() user: any) { return this.gigs.findAll(user.bandId); }
 
+  @Get(':id/summary')
+  getSummary(@CurrentUser() user: any, @Param('id') id: string) {
+    return this.gigs.getSummary(user.bandId, id);
+  }
+
   @Post()
   create(@CurrentUser() user: any, @Body() dto: any) { return this.gigs.create(user.bandId, dto); }
 

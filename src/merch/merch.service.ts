@@ -76,7 +76,7 @@ export class MerchService {
   }
 
   /** TPV: sell units, reduce stock (optionally per size), create income Transaction */
-  async sell(bandId: string, id: string, dto: { quantity: number; unitPrice: number; date: string; size?: string; notes?: string }) {
+  async sell(bandId: string, id: string, dto: { quantity: number; unitPrice: number; date: string; size?: string; notes?: string; gigId?: string }) {
     const item = await this.#findOwned(bandId, id);
     if (dto.quantity <= 0) throw new BadRequestException('La cantidad debe ser mayor que 0');
 
@@ -111,6 +111,7 @@ export class MerchService {
           amount: totalAmount,
           date: dto.date,
           description: `Venta merch: ${dto.quantity}× ${item.name}${sizeLabel} @ ${dto.unitPrice}€${dto.notes ? ` — ${dto.notes}` : ''}`,
+          gigId: dto.gigId ?? null,
         },
       }),
     ]);

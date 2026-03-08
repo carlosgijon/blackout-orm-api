@@ -14,6 +14,7 @@ import { CalendarModule } from './calendar/calendar.module';
 import { BpmModule } from './bpm/bpm.module';
 import { FinanceModule } from './finance/finance.module';
 import { MerchModule } from './merch/merch.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { MerchModule } from './merch/merch.module';
     BpmModule,
     FinanceModule,
     MerchModule,
+    AiModule,
   ],
 })
 export class AppModule {}
