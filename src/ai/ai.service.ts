@@ -19,6 +19,40 @@ export interface SetlistResult {
   explanation: string;
 }
 
+// Circle of fifths positions (0=C, 1=G, 2=D, ..., 11=F)
+const NOTE_POS: Record<string, number> = {
+  'C': 0, 'G': 1, 'D': 2, 'A': 3, 'E': 4, 'B': 5,
+  'F#': 6, 'Gb': 6, 'C#': 7, 'Db': 7, 'G#': 8, 'Ab': 8,
+  'D#': 9, 'Eb': 9, 'A#': 10, 'Bb': 10, 'F': 11,
+};
+
+// Extract root note from e.g. "Am", "F#m", "Bb", "E"
+function rootNote(note: string): string | null {
+  if (!note) return null;
+  const m = note.match(/^([A-G][#b]?)/);
+  return m ? m[1] : null;
+}
+
+// Distance on circle of fifths: 0 (unison) to 6 (tritone)
+function fifthsDist(a: string, b: string): number | null {
+  const pa = NOTE_POS[rootNote(a) ?? ''];
+  const pb = NOTE_POS[rootNote(b) ?? ''];
+  if (pa === undefined || pb === undefined) return null;
+  const d = Math.abs(pa - pb);
+  return Math.min(d, 12 - d);
+}
+
+// Quality label for distance
+function transLabel(d: number | null): string {
+  if (d === null) return '?';
+  if (d === 0) return '★★★ misma tonalidad';
+  if (d === 1) return '★★★ quinta perfecta';
+  if (d === 2) return '★★☆ buena';
+  if (d === 3) return '★☆☆ aceptable';
+  if (d <= 5) return '☆☆☆ tensa';
+  return '✗ tritono (evitar)';
+}
+
 @Injectable()
 export class AiService {
   async generateSetlist(
@@ -32,24 +66,45 @@ export class AiService {
       `${i + 1}. ID="${s.id}" | "${s.title}" | BPM: ${s.tempo ?? '?'} | Estilo: ${s.style ?? '?'} | Nota inicio: ${s.startNote ?? '?'} | Nota fin: ${s.endNote ?? '?'} | Duración: ${s.duration ? Math.round(s.duration / 60) + 'min' : '?'}`
     ).join('\n');
 
+    // Pre-compute pairwise transition scores
+    const pairs = songs.flatMap((a, i) =>
+      songs
+        .filter((_, j) => j !== i)
+        .map(b => {
+          const d = fifthsDist(a.endNote ?? '', b.startNote ?? '');
+          return { from: a.id, to: b.id, dist: d, label: transLabel(d) };
+        })
+    ).filter(p => p.dist !== null);
+
+    const transitionTable = pairs.length > 0
+      ? 'COMPATIBILIDAD DE TRANSICIONES (círculo de quintas — nota fin → nota inicio):\n' +
+        'Distancia 0=misma tonalidad (ideal), 1=quinta perfecta (excelente), 2=buena, 3+=evitar si es posible\n' +
+        pairs.map(p => {
+          const a = songs.find(s => s.id === p.from)!;
+          const b = songs.find(s => s.id === p.to)!;
+          return `  "${a.title}" → "${b.title}": dist=${p.dist} ${p.label}`;
+        }).join('\n')
+      : '';
+
     const prompt = `Eres un experto en diseño de setlists para bandas de metal.
 Tienes que ordenar las siguientes canciones para crear el mejor setlist posible.
 
 CANCIONES:
 ${songList}
+${transitionTable ? '\n' + transitionTable : ''}
 
 PREFERENCIAS DEL USUARIO: ${preferences || 'Sin preferencias específicas. Crea un setlist dinámico y equilibrado.'}
 
-CRITERIOS PARA ORDENAR:
-- Compatibilidad de tonalidades (nota final de una → nota inicial de la siguiente): menor distancia en el círculo de quintas
-- Flujo de energía: arrancar fuerte, crear variedad dinámica, no poner lentas seguidas
-- Coherencia de tempo: evitar saltos bruscos de BPM (máx. 30 BPM de diferencia entre canciones adyacentes si es posible)
-- Si hay preferencias del usuario, priorizarlas
+CRITERIOS PARA ORDENAR (en orden de prioridad):
+1. Flujo de energía: arrancar fuerte, crear variedad dinámica, no poner lentas seguidas, acabar con impacto
+2. Compatibilidad de tonalidades: usa la tabla de transiciones anterior — prioriza distancias 0 y 1 entre canciones adyacentes
+3. Coherencia de tempo: evitar saltos bruscos de BPM (máx. 30 BPM de diferencia entre canciones adyacentes si es posible)
+4. Si hay preferencias del usuario, priorizarlas sobre todo lo demás
 
 ENCADENAR CANCIONES (joinAfter):
-- Identifica pares o grupos de canciones que fluyan directamente sin pausa (misma tonalidad o muy cercana, BPM compatible).
+- Identifica pares o grupos de canciones que fluyan directamente sin pausa (distancia de tonalidad 0 o 1 Y BPM compatible).
 - Devuelve en "joinAfter" el ID de cada canción que debe ir encadenada a la siguiente (sin pausa entre ellas).
-- Solo encadena canciones cuando sea musicalmente natural. No fuerces encadenamientos.
+- Solo encadena cuando sea musicalmente natural. No fuerces encadenamientos si el BPM difiere mucho.
 
 BIS:
 - Si el setlist tiene 4 o más canciones, decide cuál es la canción tras la que se hace el corte del BIS (el público pensará que ha terminado, y la banda vuelve para el bis).
@@ -62,7 +117,7 @@ RESPONDE ÚNICAMENTE con un objeto JSON válido con esta estructura exacta (sin 
   "orderedIds": ["id1", "id2", "id3", ...],
   "joinAfter": ["id2", "id5"],
   "bisAfterSongId": "id8",
-  "explanation": "Explicación breve en español de por qué este orden funciona bien y qué canciones se encadenan (máx. 4 frases)"
+  "explanation": "Explicación breve en español de por qué este orden funciona bien, qué transiciones de tonalidad se aprovecharon y qué canciones se encadenan (máx. 4 frases)"
 }`;
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {

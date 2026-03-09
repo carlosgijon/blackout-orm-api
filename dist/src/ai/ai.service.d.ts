@@ -8,8 +8,10 @@ interface SongInput {
     endNote?: string;
     duration?: number;
 }
-interface SetlistResult {
+export interface SetlistResult {
     orderedIds: string[];
+    joinAfter: string[];
+    bisAfterSongId: string | null;
     explanation: string;
 }
 export declare class AiService {
