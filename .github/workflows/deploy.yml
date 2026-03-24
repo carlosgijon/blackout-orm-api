@@ -39,4 +39,9 @@ jobs:
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/api/rehearsals)
             echo "── GET /api/rehearsals → HTTP $STATUS (esperado 401)"
             if [ "$STATUS" = "404" ]; then echo "ERROR: ruta no registrada" && exit 1; fi
+            # Si el frontend no existe, desplegarlo también
+            if [ ! -f app/index.html ]; then
+              echo "── app/ vacío — desplegando frontend..."
+              bash deploy-frontend.sh
+            fi
             echo "✓ Backend deployed"
