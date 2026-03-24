@@ -42,5 +42,39 @@ export declare class LibraryController {
         endNote: string | null;
     }>;
     remove(user: any, id: string): Promise<void>;
+    getStats(user: any): Promise<{
+        totalSongs: number;
+        totalWithTempo: number;
+        totalWithDuration: number;
+        byGenre: Record<string, number>;
+        mostUsed: {
+            usageCount: number;
+            id: string;
+            bandId: string;
+            title: string;
+            artist: string;
+            album: string | null;
+            duration: number | null;
+            tempo: number | null;
+            style: string | null;
+            notes: string | null;
+            startNote: string | null;
+            endNote: string | null;
+        }[];
+        neverUsed: {
+            usageCount: number;
+            id: string;
+            bandId: string;
+            title: string;
+            artist: string;
+            album: string | null;
+            duration: number | null;
+            tempo: number | null;
+            style: string | null;
+            notes: string | null;
+            startNote: string | null;
+            endNote: string | null;
+        }[];
+    }>;
     getUsage(user: any, id: string): Promise<string[]>;
 }

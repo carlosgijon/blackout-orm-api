@@ -123,16 +123,16 @@ export declare class GigsController {
     getContacts(user: any, gigId: string): Promise<{
         createdAt: string;
         id: string;
-        date: string;
         notes: string | null;
+        date: string;
         gigId: string;
         contactType: string;
     }[]>;
     createContact(user: any, gigId: string, dto: any): Promise<{
         createdAt: string;
         id: string;
-        date: string;
         notes: string | null;
+        date: string;
         gigId: string;
         contactType: string;
     }>;
@@ -154,27 +154,27 @@ export declare class GigsController {
     removeChecklist(user: any, gigId: string, checklistId: string): Promise<void>;
     getItems(user: any, checklistId: string): Promise<{
         id: string;
+        sortOrder: number;
         category: string;
         checklistId: string;
         text: string;
         done: boolean;
-        sortOrder: number;
     }[]>;
     createItem(user: any, checklistId: string, dto: any): Promise<{
         id: string;
+        sortOrder: number;
         category: string;
         checklistId: string;
         text: string;
         done: boolean;
-        sortOrder: number;
     }>;
     updateItem(user: any, checklistId: string, itemId: string, dto: any): Promise<{
         id: string;
+        sortOrder: number;
         category: string;
         checklistId: string;
         text: string;
         done: boolean;
-        sortOrder: number;
     }>;
     removeItem(user: any, checklistId: string, itemId: string): Promise<void>;
     resetItems(user: any, checklistId: string): Promise<void>;

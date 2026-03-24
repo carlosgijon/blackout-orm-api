@@ -31,6 +31,34 @@ let LibraryService = class LibraryService {
         await this.#findOwned(bandId, id);
         await this.prisma.librarySong.delete({ where: { id } });
     }
+    async getStats(bandId) {
+        const songs = await this.prisma.librarySong.findMany({ where: { bandId } });
+        const usageCounts = await this.prisma.playlistSong.groupBy({
+            by: ['songId'],
+            where: { playlist: { bandId }, songId: { not: null } },
+            _count: { songId: true },
+        });
+        const countMap = new Map(usageCounts.map(u => [u.songId, u._count.songId]));
+        const withCount = songs.map(s => ({ ...s, usageCount: countMap.get(s.id) ?? 0 }));
+        const byGenre = {};
+        for (const s of songs) {
+            const g = (s.style?.trim() || 'Sin género');
+            byGenre[g] = (byGenre[g] ?? 0) + 1;
+        }
+        const mostUsed = [...withCount]
+            .filter(s => s.usageCount > 0)
+            .sort((a, b) => b.usageCount - a.usageCount)
+            .slice(0, 10);
+        const neverUsed = withCount.filter(s => s.usageCount === 0);
+        return {
+            totalSongs: songs.length,
+            totalWithTempo: songs.filter(s => s.tempo).length,
+            totalWithDuration: songs.filter(s => s.duration).length,
+            byGenre,
+            mostUsed,
+            neverUsed,
+        };
+    }
     async getUsage(bandId, id) {
         await this.#findOwned(bandId, id);
         const entries = await this.prisma.playlistSong.findMany({

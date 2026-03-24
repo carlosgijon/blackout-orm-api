@@ -90,4 +90,11 @@ export declare class PlaylistsController {
         style: any;
         notes: any;
     }[]>;
+    getGigs(user: any, id: string): Promise<{
+        id: string;
+        title: string;
+        date: string | undefined;
+        status: string;
+        venueName: string | undefined;
+    }[]>;
 }

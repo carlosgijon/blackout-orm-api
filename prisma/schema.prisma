@@ -32,6 +32,8 @@ model Band {
   transactions   Transaction[]
   wishListItems  WishListItem[]
   merchItems     MerchItem[]
+  rehearsals     Rehearsal[]
+  voteSessions   VoteSession[]
 
   @@map("bands")
 }
@@ -97,8 +99,9 @@ model LibrarySong {
   startNote String? @map("start_note") // e.g. "Em", "A#"
   endNote   String? @map("end_note")   // e.g. "G", "Db"
 
-  band          Band           @relation(fields: [bandId], references: [id], onDelete: Cascade)
-  playlistSongs PlaylistSong[]
+  band           Band            @relation(fields: [bandId], references: [id], onDelete: Cascade)
+  playlistSongs  PlaylistSong[]
+  rehearsalSongs RehearsalSong[]
 
   @@map("library_songs")
 }
@@ -110,9 +113,10 @@ model Playlist {
   description String?
   createdAt   DateTime @default(now()) @map("created_at")
 
-  band  Band           @relation(fields: [bandId], references: [id], onDelete: Cascade)
-  songs PlaylistSong[]
-  gigs  Gig[]
+  band         Band           @relation(fields: [bandId], references: [id], onDelete: Cascade)
+  songs        PlaylistSong[]
+  gigs         Gig[]
+  voteSessions VoteSession[]
 
   @@map("playlists")
 }
@@ -410,6 +414,34 @@ model WishListItem {
   @@map("wish_list_items")
 }
 
+// ── Rehearsals ──────────────────────────────────────────────────────────────
+
+model Rehearsal {
+  id        String          @id @default(uuid())
+  bandId    String          @map("band_id")
+  date      String          // YYYY-MM-DD
+  notes     String?
+  createdAt DateTime        @default(now()) @map("created_at")
+
+  band  Band            @relation(fields: [bandId], references: [id], onDelete: Cascade)
+  songs RehearsalSong[]
+
+  @@map("rehearsals")
+}
+
+model RehearsalSong {
+  id          String    @id @default(uuid())
+  rehearsalId String    @map("rehearsal_id")
+  songId      String    @map("song_id")
+  notes       String?
+  rating      Int?      // 1–5
+
+  rehearsal Rehearsal   @relation(fields: [rehearsalId], references: [id], onDelete: Cascade)
+  song      LibrarySong @relation(fields: [songId], references: [id], onDelete: Cascade)
+
+  @@map("rehearsal_songs")
+}
+
 // ── Merch ────────────────────────────────────────────────────────────────────
 
 model MerchItem {
@@ -431,4 +463,35 @@ model MerchItem {
   band Band @relation(fields: [bandId], references: [id], onDelete: Cascade)
 
   @@map("merch_items")
+}
+
+// ── Setlist Voting ───────────────────────────────────────────────────────────
+
+model VoteSession {
+  id         String   @id @default(uuid())
+  bandId     String   @map("band_id")
+  playlistId String   @map("playlist_id")
+  title      String
+  // "open" | "closed"
+  status     String   @default("open")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  band     Band        @relation(fields: [bandId], references: [id], onDelete: Cascade)
+  playlist Playlist    @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  votes    Vote[]
+
+  @@map("vote_sessions")
+}
+
+model Vote {
+  id         String   @id @default(uuid())
+  sessionId  String   @map("session_id")
+  voterName  String   @map("voter_name")
+  orderedIds String   @map("ordered_ids") // JSON array of playlist_song ids
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  session VoteSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, voterName])
+  @@map("votes")
 }

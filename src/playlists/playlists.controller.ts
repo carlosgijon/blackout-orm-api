@@ -61,4 +61,9 @@ export class PlaylistsController {
   reorder(@CurrentUser() user: any, @Param('id') id: string, @Body() dto: { ids: string[] }) {
     return this.playlists.reorder(user.bandId, id, dto.ids);
   }
+
+  @Get(':id/gigs')
+  getGigs(@CurrentUser() user: any, @Param('id') id: string) {
+    return this.playlists.getGigs(user.bandId, id);
+  }
 }

@@ -43,5 +43,39 @@ export declare class LibraryService {
         endNote: string | null;
     }>;
     remove(bandId: string, id: string): Promise<void>;
+    getStats(bandId: string): Promise<{
+        totalSongs: number;
+        totalWithTempo: number;
+        totalWithDuration: number;
+        byGenre: Record<string, number>;
+        mostUsed: {
+            usageCount: number;
+            id: string;
+            bandId: string;
+            title: string;
+            artist: string;
+            album: string | null;
+            duration: number | null;
+            tempo: number | null;
+            style: string | null;
+            notes: string | null;
+            startNote: string | null;
+            endNote: string | null;
+        }[];
+        neverUsed: {
+            usageCount: number;
+            id: string;
+            bandId: string;
+            title: string;
+            artist: string;
+            album: string | null;
+            duration: number | null;
+            tempo: number | null;
+            style: string | null;
+            notes: string | null;
+            startNote: string | null;
+            endNote: string | null;
+        }[];
+    }>;
     getUsage(bandId: string, id: string): Promise<string[]>;
 }

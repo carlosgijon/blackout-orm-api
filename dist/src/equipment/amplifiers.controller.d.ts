@@ -6,8 +6,8 @@ export declare class AmplifiersController {
         id: string;
         bandId: string;
         name: string;
-        notes: string | null;
         type: string;
+        notes: string | null;
         stagePosition: string | null;
         brand: string | null;
         model: string | null;
@@ -24,8 +24,8 @@ export declare class AmplifiersController {
         id: string;
         bandId: string;
         name: string;
-        notes: string | null;
         type: string;
+        notes: string | null;
         stagePosition: string | null;
         brand: string | null;
         model: string | null;
@@ -42,8 +42,8 @@ export declare class AmplifiersController {
         id: string;
         bandId: string;
         name: string;
-        notes: string | null;
         type: string;
+        notes: string | null;
         stagePosition: string | null;
         brand: string | null;
         model: string | null;

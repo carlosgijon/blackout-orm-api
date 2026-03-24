@@ -7,8 +7,8 @@ export declare class MicrophonesService {
         id: string;
         bandId: string;
         name: string;
-        notes: string | null;
         type: string;
+        notes: string | null;
         brand: string | null;
         model: string | null;
         polarPattern: string | null;
@@ -22,8 +22,8 @@ export declare class MicrophonesService {
         id: string;
         bandId: string;
         name: string;
-        notes: string | null;
         type: string;
+        notes: string | null;
         brand: string | null;
         model: string | null;
         polarPattern: string | null;
@@ -37,8 +37,8 @@ export declare class MicrophonesService {
         id: string;
         bandId: string;
         name: string;
-        notes: string | null;
         type: string;
+        notes: string | null;
         brand: string | null;
         model: string | null;
         polarPattern: string | null;

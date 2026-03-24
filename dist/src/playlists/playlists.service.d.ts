@@ -2,6 +2,13 @@ import { PrismaService } from '../prisma/prisma.service';
 export declare class PlaylistsService {
     #private;
     private readonly prisma;
+    getGigs(bandId: string, playlistId: string): Promise<{
+        id: string;
+        title: string;
+        date: string | undefined;
+        status: string;
+        venueName: string | undefined;
+    }[]>;
     constructor(prisma: PrismaService);
     findAll(bandId: string): Promise<{
         id: string;

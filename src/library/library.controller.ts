@@ -32,6 +32,11 @@ export class LibraryController {
     return this.library.remove(user.bandId, id);
   }
 
+  @Get('stats')
+  getStats(@CurrentUser() user: any) {
+    return this.library.getStats(user.bandId);
+  }
+
   @Get(':id/usage')
   getUsage(@CurrentUser() user: any, @Param('id') id: string) {
     return this.library.getUsage(user.bandId, id);

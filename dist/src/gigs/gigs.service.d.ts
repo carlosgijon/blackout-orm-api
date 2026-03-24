@@ -87,16 +87,16 @@ export declare class GigsService {
     getContacts(bandId: string, gigId: string): Promise<{
         createdAt: string;
         id: string;
-        date: string;
         notes: string | null;
+        date: string;
         gigId: string;
         contactType: string;
     }[]>;
     createContact(bandId: string, gigId: string, dto: any): Promise<{
         createdAt: string;
         id: string;
-        date: string;
         notes: string | null;
+        date: string;
         gigId: string;
         contactType: string;
     }>;
@@ -118,27 +118,27 @@ export declare class GigsService {
     removeChecklist(bandId: string, gigId: string, checklistId: string): Promise<void>;
     getItems(bandId: string, checklistId: string): Promise<{
         id: string;
-        checklistId: string;
+        sortOrder: number;
         category: string;
+        checklistId: string;
         text: string;
         done: boolean;
-        sortOrder: number;
     }[]>;
     createItem(bandId: string, checklistId: string, dto: any): Promise<{
         id: string;
-        checklistId: string;
+        sortOrder: number;
         category: string;
+        checklistId: string;
         text: string;
         done: boolean;
-        sortOrder: number;
     }>;
     updateItem(bandId: string, checklistId: string, itemId: string, dto: any): Promise<{
         id: string;
-        checklistId: string;
+        sortOrder: number;
         category: string;
+        checklistId: string;
         text: string;
         done: boolean;
-        sortOrder: number;
     }>;
     removeItem(bandId: string, checklistId: string, itemId: string): Promise<void>;
     resetItems(bandId: string, checklistId: string): Promise<void>;

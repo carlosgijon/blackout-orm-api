@@ -28,6 +28,23 @@ function toView(ps: any) {
 
 @Injectable()
 export class PlaylistsService {
+
+  async getGigs(bandId: string, playlistId: string) {
+    await this.#findOwned(bandId, playlistId);
+    const gigs = await this.prisma.gig.findMany({
+      where: { bandId, setlistId: playlistId },
+      include: { venue: { select: { name: true } } },
+      orderBy: { date: 'desc' },
+    });
+    return gigs.map(g => ({
+      id: g.id,
+      title: g.title,
+      date: g.date ?? undefined,
+      status: g.status,
+      venueName: g.venue?.name ?? undefined,
+    }));
+  }
+
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(bandId: string) {
