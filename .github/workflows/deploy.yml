@@ -19,6 +19,7 @@ jobs:
           script: |
             set -e
             cd ~/blackout-orm-api
+            sudo chown -R $(whoami):$(whoami) .git || chmod -R u+rw .git
             git fetch origin
             git reset --hard origin/main
             echo "── Commit en VPS: $(git rev-parse --short HEAD)"
