@@ -18,16 +18,19 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             set -e
-            # Preservar .env y build del frontend antes de reclonear
-            [ -f ~/blackout-orm-api/.env ] && cp ~/blackout-orm-api/.env /tmp/blackout.env
-            [ -d ~/blackout-orm-api/app ]  && cp -r ~/blackout-orm-api/app /tmp/blackout-app
-            # Reclone limpio (elimina el problema de permisos en .git/objects)
-            rm -rf ~/blackout-orm-api
-            git clone https://github.com/carlosgijon/blackout-orm-api.git ~/blackout-orm-api
-            cd ~/blackout-orm-api
+            REPO="$HOME/blackout-orm-api"
+            # Usar Docker (corre como root) para arreglar permisos del .git bloqueado por root
+            docker run --rm -v "$REPO":/repo alpine chown -R $(id -u):$(id -g) /repo
+            # Preservar .env y build del frontend
+            [ -f "$REPO/.env" ] && cp "$REPO/.env" /tmp/blackout.env
+            [ -d "$REPO/app"  ] && cp -r "$REPO/app" /tmp/blackout-app
+            # Reclone limpio
+            rm -rf "$REPO"
+            git clone https://github.com/carlosgijon/blackout-orm-api.git "$REPO"
+            cd "$REPO"
             # Restaurar archivos de datos
-            [ -f /tmp/blackout.env ]  && cp /tmp/blackout.env .env
-            [ -d /tmp/blackout-app ]  && cp -r /tmp/blackout-app app
+            [ -f /tmp/blackout.env ] && cp /tmp/blackout.env .env
+            [ -d /tmp/blackout-app ] && cp -r /tmp/blackout-app app
             echo "── Commit: $(git rev-parse --short HEAD)"
             docker compose build --no-cache
             docker compose up -d
