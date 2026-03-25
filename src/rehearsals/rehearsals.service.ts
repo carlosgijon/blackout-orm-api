@@ -55,7 +55,7 @@ export class RehearsalsService {
   async addSong(bandId: string, rehearsalId: string, dto: { songId: string; notes?: string; rating?: number }) {
     await this.#findOwned(bandId, rehearsalId);
     const rs = await this.prisma.rehearsalSong.create({
-      data: { rehearsalId, songId: dto.songId, notes: dto.notes, rating: dto.rating },
+      data: { rehearsalId, songId: dto.songId, notes: dto.notes, rating: dto.rating != null ? +dto.rating : undefined },
       include: { song: { select: { id: true, title: true, artist: true, tempo: true, style: true } } },
     });
     return {
@@ -74,7 +74,7 @@ export class RehearsalsService {
     await this.#findOwned(bandId, rehearsalId);
     const rs = await this.prisma.rehearsalSong.update({
       where: { id: entryId },
-      data: dto,
+      data: { ...dto, rating: dto.rating != null ? +dto.rating : undefined },
       include: { song: { select: { id: true, title: true, artist: true, tempo: true, style: true } } },
     });
     return {
