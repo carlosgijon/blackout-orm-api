@@ -135,4 +135,52 @@ export class MerchService {
     if (!m || m.bandId !== bandId) throw new NotFoundException('Merch item not found');
     return m;
   }
+
+  // ── Waiting List ──────────────────────────────────────────────────
+
+  async getAllWaiting(bandId: string) {
+    const rows = await this.prisma.merchWaitingEntry.findMany({
+      where: { bandId },
+      include: { item: { select: { id: true, name: true, type: true } } },
+      orderBy: { createdAt: 'asc' },
+    });
+    return rows.map(r => ({
+      id: r.id, itemId: r.itemId, itemName: r.item.name, itemType: r.item.type,
+      name: r.name, size: r.size ?? undefined, contact: r.contact ?? undefined,
+      notes: r.notes ?? undefined, status: r.status, createdAt: r.createdAt.toISOString(),
+    }));
+  }
+
+  async addToWaitingList(bandId: string, itemId: string, dto: { name: string; size?: string; contact?: string; notes?: string }) {
+    await this.#findOwned(bandId, itemId);
+    const r = await this.prisma.merchWaitingEntry.create({
+      data: { bandId, itemId, ...dto },
+      include: { item: { select: { id: true, name: true, type: true } } },
+    });
+    return {
+      id: r.id, itemId: r.itemId, itemName: r.item.name, itemType: r.item.type,
+      name: r.name, size: r.size ?? undefined, contact: r.contact ?? undefined,
+      notes: r.notes ?? undefined, status: r.status, createdAt: r.createdAt.toISOString(),
+    };
+  }
+
+  async updateWaitingEntry(bandId: string, entryId: string, dto: { status?: string; contact?: string; notes?: string }) {
+    const entry = await this.prisma.merchWaitingEntry.findUnique({ where: { id: entryId } });
+    if (!entry || entry.bandId !== bandId) throw new NotFoundException('Entry not found');
+    const r = await this.prisma.merchWaitingEntry.update({
+      where: { id: entryId }, data: dto,
+      include: { item: { select: { id: true, name: true, type: true } } },
+    });
+    return {
+      id: r.id, itemId: r.itemId, itemName: r.item.name, itemType: r.item.type,
+      name: r.name, size: r.size ?? undefined, contact: r.contact ?? undefined,
+      notes: r.notes ?? undefined, status: r.status, createdAt: r.createdAt.toISOString(),
+    };
+  }
+
+  async removeWaitingEntry(bandId: string, entryId: string) {
+    const entry = await this.prisma.merchWaitingEntry.findUnique({ where: { id: entryId } });
+    if (!entry || entry.bandId !== bandId) throw new NotFoundException('Entry not found');
+    await this.prisma.merchWaitingEntry.delete({ where: { id: entryId } });
+  }
 }

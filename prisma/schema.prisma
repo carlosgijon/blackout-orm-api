@@ -31,8 +31,9 @@ model Band {
   calendarEvents CalendarEvent[]
   transactions   Transaction[]
   wishListItems  WishListItem[]
-  merchItems     MerchItem[]
-  rehearsals     Rehearsal[]
+  merchItems        MerchItem[]
+  merchWaitingList  MerchWaitingEntry[]
+  rehearsals        Rehearsal[]
   voteSessions   VoteSession[]
 
   @@map("bands")
@@ -460,9 +461,28 @@ model MerchItem {
   notes          String?
   createdAt      DateTime @default(now()) @map("created_at")
 
-  band Band @relation(fields: [bandId], references: [id], onDelete: Cascade)
+  band        Band               @relation(fields: [bandId], references: [id], onDelete: Cascade)
+  waitingList MerchWaitingEntry[]
 
   @@map("merch_items")
+}
+
+model MerchWaitingEntry {
+  id        String   @id @default(uuid())
+  bandId    String   @map("band_id")
+  itemId    String   @map("item_id")
+  name      String
+  size      String?
+  contact   String?
+  notes     String?
+  // "waiting" | "notified" | "delivered"
+  status    String   @default("waiting")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  band Band     @relation(fields: [bandId], references: [id], onDelete: Cascade)
+  item MerchItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@map("merch_waiting_list")
 }
 
 // ── Setlist Voting ───────────────────────────────────────────────────────────

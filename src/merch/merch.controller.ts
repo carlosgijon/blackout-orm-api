@@ -22,6 +22,25 @@ export class MerchController {
     return this.merch.create(user.bandId, dto);
   }
 
+  // ── Waiting list — literal routes BEFORE :id to avoid conflicts ──
+
+  @Get('waiting')
+  getAllWaiting(@CurrentUser() user: any) {
+    return this.merch.getAllWaiting(user.bandId);
+  }
+
+  @Put('waiting/:entryId')
+  updateWaitingEntry(@CurrentUser() user: any, @Param('entryId') entryId: string, @Body() dto: any) {
+    return this.merch.updateWaitingEntry(user.bandId, entryId, dto);
+  }
+
+  @Delete('waiting/:entryId')
+  removeWaitingEntry(@CurrentUser() user: any, @Param('entryId') entryId: string) {
+    return this.merch.removeWaitingEntry(user.bandId, entryId);
+  }
+
+  // ── Item routes ──────────────────────────────────────────────────
+
   @Put(':id')
   update(@CurrentUser() user: any, @Param('id') id: string, @Body() dto: any) {
     return this.merch.update(user.bandId, id, dto);
@@ -40,5 +59,10 @@ export class MerchController {
   @Put(':id/stock')
   restock(@CurrentUser() user: any, @Param('id') id: string, @Body() dto: any) {
     return this.merch.restock(user.bandId, id, dto);
+  }
+
+  @Post(':id/waiting')
+  addToWaitingList(@CurrentUser() user: any, @Param('id') id: string, @Body() dto: any) {
+    return this.merch.addToWaitingList(user.bandId, id, dto);
   }
 }
