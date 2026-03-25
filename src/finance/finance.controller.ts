@@ -55,4 +55,16 @@ export class FinanceController {
   removeWishListItem(@CurrentUser() user: any, @Param('id') id: string) {
     return this.finance.removeWishListItem(user.bandId, id);
   }
+
+  // -- Initial Balance --
+
+  @Get('balance')
+  getInitialBalance(@CurrentUser() user: any) {
+    return this.finance.getInitialBalance(user.bandId);
+  }
+
+  @Put('balance')
+  setInitialBalance(@CurrentUser() user: any, @Body() body: { initialBalance: number }) {
+    return this.finance.setInitialBalance(user.bandId, body.initialBalance);
+  }
 }

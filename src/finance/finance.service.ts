@@ -127,4 +127,22 @@ export class FinanceService {
     if (!w || w.bandId !== bandId) throw new NotFoundException('Wish list item not found');
     return w;
   }
+
+  // -- Initial Balance --
+
+  async getInitialBalance(bandId: string): Promise<{ initialBalance: number }> {
+    const row = await this.prisma.setting.findUnique({
+      where: { bandId_key: { bandId, key: 'initial_balance' } },
+    });
+    return { initialBalance: row ? parseFloat(row.value) : 0 };
+  }
+
+  async setInitialBalance(bandId: string, amount: number): Promise<{ initialBalance: number }> {
+    await this.prisma.setting.upsert({
+      where: { bandId_key: { bandId, key: 'initial_balance' } },
+      update: { value: String(amount) },
+      create: { bandId, key: 'initial_balance', value: String(amount) },
+    });
+    return { initialBalance: amount };
+  }
 }
