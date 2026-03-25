@@ -472,6 +472,7 @@ model MerchWaitingEntry {
   bandId    String   @map("band_id")
   itemId    String   @map("item_id")
   name      String
+  quantity  Int      @default(1)
   size      String?
   contact   String?
   notes     String?

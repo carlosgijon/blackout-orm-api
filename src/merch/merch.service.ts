@@ -144,24 +144,16 @@ export class MerchService {
       include: { item: { select: { id: true, name: true, type: true } } },
       orderBy: { createdAt: 'asc' },
     });
-    return rows.map(r => ({
-      id: r.id, itemId: r.itemId, itemName: r.item.name, itemType: r.item.type,
-      name: r.name, size: r.size ?? undefined, contact: r.contact ?? undefined,
-      notes: r.notes ?? undefined, status: r.status, createdAt: r.createdAt.toISOString(),
-    }));
+    return rows.map(r => this.#toEntry(r));
   }
 
-  async addToWaitingList(bandId: string, itemId: string, dto: { name: string; size?: string; contact?: string; notes?: string }) {
+  async addToWaitingList(bandId: string, itemId: string, dto: { name: string; quantity?: number; size?: string; contact?: string; notes?: string }) {
     await this.#findOwned(bandId, itemId);
     const r = await this.prisma.merchWaitingEntry.create({
-      data: { bandId, itemId, ...dto },
+      data: { bandId, itemId, quantity: dto.quantity ?? 1, name: dto.name, size: dto.size, contact: dto.contact, notes: dto.notes },
       include: { item: { select: { id: true, name: true, type: true } } },
     });
-    return {
-      id: r.id, itemId: r.itemId, itemName: r.item.name, itemType: r.item.type,
-      name: r.name, size: r.size ?? undefined, contact: r.contact ?? undefined,
-      notes: r.notes ?? undefined, status: r.status, createdAt: r.createdAt.toISOString(),
-    };
+    return this.#toEntry(r);
   }
 
   async updateWaitingEntry(bandId: string, entryId: string, dto: { status?: string; contact?: string; notes?: string }) {
@@ -171,10 +163,15 @@ export class MerchService {
       where: { id: entryId }, data: dto,
       include: { item: { select: { id: true, name: true, type: true } } },
     });
+    return this.#toEntry(r);
+  }
+
+  #toEntry(r: any) {
     return {
       id: r.id, itemId: r.itemId, itemName: r.item.name, itemType: r.item.type,
-      name: r.name, size: r.size ?? undefined, contact: r.contact ?? undefined,
-      notes: r.notes ?? undefined, status: r.status, createdAt: r.createdAt.toISOString(),
+      name: r.name, quantity: r.quantity ?? 1, size: r.size ?? undefined,
+      contact: r.contact ?? undefined, notes: r.notes ?? undefined,
+      status: r.status, createdAt: r.createdAt.toISOString(),
     };
   }
 
