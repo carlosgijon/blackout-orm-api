@@ -18,7 +18,7 @@ export class SettingsController {
   }
 
   @Post()
-  set(@CurrentUser() user: any, @Body() dto: { theme?: string; bpmApiKey?: string }) {
+  set(@CurrentUser() user: any, @Body() dto: { theme?: string; bpmApiKey?: string; fontSize?: string; fontFamily?: string }) {
     return this.settings.set(user.bandId, dto);
   }
 }
