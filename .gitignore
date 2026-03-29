@@ -3,3 +3,12 @@ node_modules
 .env
 
 /generated/prisma
+
+# Maven / Spring Boot
+target/
+*.jar
+*.war
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/
+mvnw
+mvnw.cmd
