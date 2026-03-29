@@ -1,0 +1,32 @@
+# ── Perfil LOCAL — para probar en tu máquina ──────────────────────────
+# Uso: mvn spring-boot:run -Dspring-boot.run.profiles=local
+#
+# Apunta a la BD PostgreSQL que ya usa el NestJS (mismos datos).
+# Flyway detectará que ya existe el schema, creará flyway_schema_history
+# con un baseline en V1 y NO ejecutará V1__initial_schema.sql.
+# Tus datos están completamente a salvo.
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/blackout_orm
+    username: postgres
+    password: postgres
+
+  jpa:
+    show-sql: true          # muestra SQL en consola — útil para depurar
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    com.blackout: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.flywaydb: INFO
+
+server:
+  port: 3002              # puerto distinto para no chocar con el NestJS (3001)
+
+jwt:
+  secret: local-dev-secret-at-least-32-chars-long
+  expiration-ms: 604800000

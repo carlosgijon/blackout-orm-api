@@ -12,7 +12,8 @@ public class Rehearsal {
     private String notes;
     @Column(name = "created_at", nullable = false, updatable = false) private Instant createdAt = Instant.now();
 
-    @OneToMany(mappedBy = "rehearsalId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "rehearsal_id")
     private List<RehearsalSong> songs = new ArrayList<>();
 
     protected Rehearsal() {}

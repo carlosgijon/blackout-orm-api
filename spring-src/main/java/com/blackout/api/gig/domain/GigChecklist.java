@@ -11,7 +11,8 @@ public class GigChecklist {
     @Column(nullable = false) private String name;
     @Column(name = "created_at", nullable = false, updatable = false) private Instant createdAt = Instant.now();
 
-    @OneToMany(mappedBy = "checklistId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "checklist_id")
     @OrderBy("sort_order ASC")
     private List<ChecklistItem> items = new ArrayList<>();
 

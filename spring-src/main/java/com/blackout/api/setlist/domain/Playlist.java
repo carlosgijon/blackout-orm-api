@@ -22,7 +22,8 @@ public class Playlist {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
-    @OneToMany(mappedBy = "playlistId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "playlist_id")
     @OrderBy("position ASC")
     private List<PlaylistSong> songs = new ArrayList<>();
 

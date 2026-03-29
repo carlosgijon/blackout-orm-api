@@ -13,7 +13,8 @@ public class VoteSession {
     @Column(nullable = false) private String status = "open";
     @Column(name = "created_at", nullable = false, updatable = false) private Instant createdAt = Instant.now();
 
-    @OneToMany(mappedBy = "sessionId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "session_id")
     private List<Vote> votes = new ArrayList<>();
 
     protected VoteSession() {}
