@@ -30,6 +30,25 @@ services:
     restart: unless-stopped
     # Port not exposed directly — only accessible through nginx
 
+  spring-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.spring
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/blackout_orm
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:4200}
+      SERVER_PORT: 3002
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    # Port not exposed directly — only accessible through nginx
+    # Remove this service once NestJS is fully replaced by Spring
+
   nginx:
     image: nginx:alpine
     ports:
