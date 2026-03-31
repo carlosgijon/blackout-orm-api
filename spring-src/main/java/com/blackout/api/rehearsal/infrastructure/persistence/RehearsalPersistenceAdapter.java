@@ -40,6 +40,10 @@ class RehearsalPersistenceAdapter implements LoadRehearsalPort, SaveRehearsalPor
 
     @Override
     public void deleteById(String id) {
+        // Delete songs first via native SQL to avoid Hibernate's SET NULL pattern
+        em.createNativeQuery("DELETE FROM rehearsal_songs WHERE rehearsal_id = ?1")
+                .setParameter(1, id)
+                .executeUpdate();
         repo.deleteById(id);
     }
 
