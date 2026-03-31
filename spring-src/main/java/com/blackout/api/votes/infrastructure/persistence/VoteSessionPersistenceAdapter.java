@@ -11,9 +11,12 @@ import java.util.Optional;
 class VoteSessionPersistenceAdapter implements LoadVoteSessionPort, SaveVoteSessionPort {
 
     private final JpaVoteSessionRepository repo;
+    private final JpaPlaylistForVotesRepository playlistRepo;
 
-    VoteSessionPersistenceAdapter(JpaVoteSessionRepository repo) {
+    VoteSessionPersistenceAdapter(JpaVoteSessionRepository repo,
+                                   JpaPlaylistForVotesRepository playlistRepo) {
         this.repo = repo;
+        this.playlistRepo = playlistRepo;
     }
 
     @Override
@@ -40,5 +43,10 @@ class VoteSessionPersistenceAdapter implements LoadVoteSessionPort, SaveVoteSess
     @Override
     public void deleteById(String id) {
         repo.deleteById(id);
+    }
+
+    @Override
+    public boolean existsPlaylistByIdAndBandId(String playlistId, String bandId) {
+        return playlistRepo.existsByIdAndBandId(playlistId, bandId);
     }
 }

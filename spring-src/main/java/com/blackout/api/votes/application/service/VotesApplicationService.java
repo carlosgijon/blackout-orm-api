@@ -7,7 +7,6 @@ import com.blackout.api.votes.application.port.out.LoadVoteSessionPort;
 import com.blackout.api.votes.application.port.out.SaveVoteSessionPort;
 import com.blackout.api.votes.domain.Vote;
 import com.blackout.api.votes.domain.VoteSession;
-import com.blackout.api.votes.infrastructure.persistence.JpaPlaylistForVotesRepository;
 import com.blackout.api.votes.infrastructure.web.dto.VoteResponse;
 import com.blackout.api.votes.infrastructure.web.dto.VoteResultEntry;
 import com.blackout.api.votes.infrastructure.web.dto.VoteSessionResponse;
@@ -26,18 +25,15 @@ public class VotesApplicationService {
 
     private final LoadVoteSessionPort loadVoteSession;
     private final SaveVoteSessionPort saveVoteSession;
-    private final JpaPlaylistForVotesRepository playlistRepo;
     private final ObjectMapper objectMapper;
 
     public VotesApplicationService(
             LoadVoteSessionPort loadVoteSession,
             SaveVoteSessionPort saveVoteSession,
-            JpaPlaylistForVotesRepository playlistRepo,
             ObjectMapper objectMapper
     ) {
         this.loadVoteSession = loadVoteSession;
         this.saveVoteSession = saveVoteSession;
-        this.playlistRepo = playlistRepo;
         this.objectMapper = objectMapper;
     }
 
@@ -48,7 +44,7 @@ public class VotesApplicationService {
 
     @Transactional
     public VoteSessionResponse createSession(String bandId, String playlistId, String title) {
-        if (!playlistRepo.existsByIdAndBandId(playlistId, bandId)) {
+        if (!loadVoteSession.existsPlaylistByIdAndBandId(playlistId, bandId)) {
             throw new ResourceNotFoundException("Playlist not found");
         }
         VoteSession session = new VoteSession(bandId, playlistId, title);

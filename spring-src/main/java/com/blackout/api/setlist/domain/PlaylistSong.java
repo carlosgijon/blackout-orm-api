@@ -27,7 +27,7 @@ public class PlaylistSong {
     @Column(name = "join_with_next", nullable = false)
     private boolean joinWithNext = false;
 
-    protected PlaylistSong() {}
+    public PlaylistSong() {}
 
     public String getId() { return id; }
     public String getPlaylistId() { return playlistId; }
