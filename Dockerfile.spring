@@ -21,7 +21,7 @@ RUN mvn -f pom.xml dependency:go-offline -B --quiet 2>/dev/null || true
 COPY spring-src ./spring-src
 
 # Build (skip tests in Docker build — run in CI)
-RUN mvn -f pom.xml package -DskipTests -B --quiet
+RUN mvn -f pom.xml package -DskipTests -B
 
 # ── Stage 2: Runtime ──────────────────────────────────────────────────────────
 FROM eclipse-temurin:21-jre-alpine AS runner
