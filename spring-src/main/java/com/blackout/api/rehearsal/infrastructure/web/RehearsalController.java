@@ -20,7 +20,7 @@ public class RehearsalController {
     }
 
     @GetMapping
-    public List<RehearsalSummaryResponse> findAll(BlackoutAuthentication auth) {
+    public List<RehearsalResponse> findAll(BlackoutAuthentication auth) {
         return service.findAll(auth.getBandId());
     }
 
