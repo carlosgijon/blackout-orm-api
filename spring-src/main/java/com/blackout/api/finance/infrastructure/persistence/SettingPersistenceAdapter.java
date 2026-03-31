@@ -10,9 +10,9 @@ import java.util.Optional;
 @Component("financeSettingPersistenceAdapter")
 class SettingPersistenceAdapter implements LoadSettingPort, SaveSettingPort {
 
-    private final JpaSettingRepository repo;
+    private final JpaSettingForFinanceRepository repo;
 
-    SettingPersistenceAdapter(JpaSettingRepository repo) {
+    SettingPersistenceAdapter(JpaSettingForFinanceRepository repo) {
         this.repo = repo;
     }
 

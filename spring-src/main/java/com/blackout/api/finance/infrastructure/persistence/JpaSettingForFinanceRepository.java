@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-interface JpaSettingRepository extends JpaRepository<Setting, String> {
+interface JpaSettingForFinanceRepository extends JpaRepository<Setting, String> {
 
     Optional<Setting> findByBandIdAndKey(String bandId, String key);
 }
