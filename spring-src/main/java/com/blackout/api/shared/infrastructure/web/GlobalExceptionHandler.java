@@ -2,6 +2,8 @@ package com.blackout.api.shared.infrastructure.web;
 
 import com.blackout.api.shared.domain.*;
 import jakarta.validation.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -14,6 +16,8 @@ import java.util.*;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     record ErrorResponse(int status, String message, Instant timestamp) {}
     record ValidationErrorResponse(int status, String message, Map<String, String> errors, Instant timestamp) {}
@@ -73,6 +77,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleGeneric(Exception ex) {
+        log.error("Unhandled exception: {}", ex.getMessage(), ex);
         return new ErrorResponse(500, "Internal server error", Instant.now());
     }
 }
