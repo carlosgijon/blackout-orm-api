@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-@Component
+@Component("financeSettingPersistenceAdapter")
 class SettingPersistenceAdapter implements LoadSettingPort, SaveSettingPort {
 
     private final JpaSettingRepository repo;
