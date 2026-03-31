@@ -114,12 +114,11 @@ public class RehearsalApplicationService {
     }
 
     private RehearsalSongResponse toSongResponse(RehearsalSong s) {
-        // Entity fields: id, rehearsalId, songId, notes, rating
-        // DTO fields: id, rehearsalId, songId, title (null), duration (mapped from rating), notes
+        String title = loadRehearsal.findLibrarySongTitle(s.getSongId());
         return new RehearsalSongResponse(
                 s.getId(), s.getRehearsalId(), s.getSongId(),
-                null,          // title not stored in entity
-                s.getRating(), // duration mapped from rating
+                title,
+                s.getRating(),
                 s.getNotes());
     }
 }

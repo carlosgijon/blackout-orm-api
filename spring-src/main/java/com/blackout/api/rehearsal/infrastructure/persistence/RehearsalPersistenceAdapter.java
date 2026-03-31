@@ -4,6 +4,7 @@ import com.blackout.api.rehearsal.application.port.out.LoadRehearsalPort;
 import com.blackout.api.rehearsal.application.port.out.SaveRehearsalPort;
 import com.blackout.api.rehearsal.domain.Rehearsal;
 import com.blackout.api.rehearsal.domain.RehearsalSong;
+import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,10 +15,12 @@ class RehearsalPersistenceAdapter implements LoadRehearsalPort, SaveRehearsalPor
 
     private final JpaRehearsalRepository repo;
     private final JpaRehearsalSongRepository songRepo;
+    private final EntityManager em;
 
-    RehearsalPersistenceAdapter(JpaRehearsalRepository repo, JpaRehearsalSongRepository songRepo) {
+    RehearsalPersistenceAdapter(JpaRehearsalRepository repo, JpaRehearsalSongRepository songRepo, EntityManager em) {
         this.repo = repo;
         this.songRepo = songRepo;
+        this.em = em;
     }
 
     @Override
@@ -48,5 +51,14 @@ class RehearsalPersistenceAdapter implements LoadRehearsalPort, SaveRehearsalPor
     @Override
     public void deleteSongById(String id) {
         songRepo.deleteById(id);
+    }
+
+    @Override
+    public String findLibrarySongTitle(String songId) {
+        List<?> result = em.createNativeQuery(
+                "SELECT title FROM library_songs WHERE id = ?1")
+                .setParameter(1, songId)
+                .getResultList();
+        return result.isEmpty() ? null : (String) result.get(0);
     }
 }
