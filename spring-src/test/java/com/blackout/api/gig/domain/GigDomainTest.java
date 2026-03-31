@@ -111,7 +111,7 @@ class GigDomainTest {
         assertThat(publishedEvents).hasSize(1);
         GigMarkedAsCobrado event = (GigMarkedAsCobrado) publishedEvents.get(0);
         assertThat(event.bandId()).isEqualTo("band-1");
-        assertThat(event.gigTitle()).isEqualTo("Summer Fest");
+        assertThat(event.title()).isEqualTo("Summer Fest");
         assertThat(event.pay()).isEqualTo("800€");
     }
 }
