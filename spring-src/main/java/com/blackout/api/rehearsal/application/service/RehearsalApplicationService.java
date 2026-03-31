@@ -70,14 +70,11 @@ public class RehearsalApplicationService {
         String songId = dto.songId() != null ? dto.songId() : "";
         RehearsalSong song = new RehearsalSong(rehearsalId, songId);
         song.setNotes(dto.notes());
-        // duration maps to rating (Integer) since entity doesn't have title/duration fields
         song.setRating(dto.duration());
 
-        r.getSongs().add(song);
-        Rehearsal saved = saveRehearsal.save(r);
-
-        RehearsalSong savedSong = saved.getSongs().getLast();
-        return toSongResponse(savedSong);
+        // Save directly to avoid Hibernate's INSERT-NULL-then-UPDATE pattern
+        // that violates the NOT NULL constraint on rehearsal_id
+        return toSongResponse(saveRehearsal.saveSong(song));
     }
 
     @Transactional
@@ -102,9 +99,9 @@ public class RehearsalApplicationService {
         Rehearsal r = loadRehearsal.findByIdAndBandId(rehearsalId, bandId)
                 .orElseThrow(() -> new ResourceNotFoundException("Rehearsal not found: " + rehearsalId));
 
-        boolean removed = r.getSongs().removeIf(s -> s.getId().equals(songId));
-        if (!removed) throw new ResourceNotFoundException("RehearsalSong not found: " + songId);
-        saveRehearsal.save(r);
+        boolean exists = r.getSongs().stream().anyMatch(s -> s.getId().equals(songId));
+        if (!exists) throw new ResourceNotFoundException("RehearsalSong not found: " + songId);
+        saveRehearsal.deleteSongById(songId);
     }
 
     // ── Mappers ───────────────────────────────────────────────────────────────

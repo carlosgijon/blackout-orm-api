@@ -79,12 +79,12 @@ public class FinanceController {
 
     // ── Initial Balance ───────────────────────────────────────────────────────
 
-    @GetMapping("/initial-balance")
+    @GetMapping({"/initial-balance", "/balance"})
     public InitialBalanceResponse getInitialBalance(BlackoutAuthentication auth) {
         return service.getInitialBalance(auth.getBandId());
     }
 
-    @PutMapping("/initial-balance")
+    @PutMapping({"/initial-balance", "/balance"})
     public InitialBalanceResponse setInitialBalance(
             BlackoutAuthentication auth,
             @RequestBody InitialBalanceRequest dto) {

@@ -3,6 +3,7 @@ package com.blackout.api.rehearsal.infrastructure.persistence;
 import com.blackout.api.rehearsal.application.port.out.LoadRehearsalPort;
 import com.blackout.api.rehearsal.application.port.out.SaveRehearsalPort;
 import com.blackout.api.rehearsal.domain.Rehearsal;
+import com.blackout.api.rehearsal.domain.RehearsalSong;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -12,9 +13,11 @@ import java.util.Optional;
 class RehearsalPersistenceAdapter implements LoadRehearsalPort, SaveRehearsalPort {
 
     private final JpaRehearsalRepository repo;
+    private final JpaRehearsalSongRepository songRepo;
 
-    RehearsalPersistenceAdapter(JpaRehearsalRepository repo) {
+    RehearsalPersistenceAdapter(JpaRehearsalRepository repo, JpaRehearsalSongRepository songRepo) {
         this.repo = repo;
+        this.songRepo = songRepo;
     }
 
     @Override
@@ -35,5 +38,15 @@ class RehearsalPersistenceAdapter implements LoadRehearsalPort, SaveRehearsalPor
     @Override
     public void deleteById(String id) {
         repo.deleteById(id);
+    }
+
+    @Override
+    public RehearsalSong saveSong(RehearsalSong song) {
+        return songRepo.save(song);
+    }
+
+    @Override
+    public void deleteSongById(String id) {
+        songRepo.deleteById(id);
     }
 }
