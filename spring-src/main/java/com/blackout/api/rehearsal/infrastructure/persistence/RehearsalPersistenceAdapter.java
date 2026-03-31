@@ -54,11 +54,18 @@ class RehearsalPersistenceAdapter implements LoadRehearsalPort, SaveRehearsalPor
     }
 
     @Override
-    public String findLibrarySongTitle(String songId) {
+    public String[] findLibrarySongInfo(String songId) {
         List<?> result = em.createNativeQuery(
-                "SELECT title FROM library_songs WHERE id = ?1")
+                "SELECT title, artist, tempo, style FROM library_songs WHERE id = ?1")
                 .setParameter(1, songId)
                 .getResultList();
-        return result.isEmpty() ? null : (String) result.get(0);
+        if (result.isEmpty()) return new String[]{null, null, null, null};
+        Object[] row = (Object[]) result.get(0);
+        return new String[]{
+            (String) row[0],
+            (String) row[1],
+            row[2] != null ? row[2].toString() : null,
+            (String) row[3]
+        };
     }
 }

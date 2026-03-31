@@ -23,12 +23,9 @@ public class RehearsalApplicationService {
         this.saveRehearsal = saveRehearsal;
     }
 
-    public List<RehearsalSummaryResponse> findAll(String bandId) {
+    public List<RehearsalResponse> findAll(String bandId) {
         return loadRehearsal.findAllByBandIdOrderByDateDesc(bandId)
-                .stream().map(r -> new RehearsalSummaryResponse(
-                        r.getId(), r.getBandId(), r.getDate(), r.getNotes(),
-                        r.getSongs().size(), r.getCreatedAt()))
-                .toList();
+                .stream().map(this::toResponse).toList();
     }
 
     public RehearsalResponse findOne(String bandId, String id) {
@@ -62,18 +59,14 @@ public class RehearsalApplicationService {
 
     @Transactional
     public RehearsalSongResponse addSong(String bandId, String rehearsalId, AddRehearsalSongRequest dto) {
-        Rehearsal r = loadRehearsal.findByIdAndBandId(rehearsalId, bandId)
+        loadRehearsal.findByIdAndBandId(rehearsalId, bandId)
                 .orElseThrow(() -> new ResourceNotFoundException("Rehearsal not found: " + rehearsalId));
 
-        // RehearsalSong entity uses songId (non-nullable), notes, rating
-        // Map: dto.songId → songId (use placeholder if null), dto.duration → rating, dto.notes → notes
         String songId = dto.songId() != null ? dto.songId() : "";
         RehearsalSong song = new RehearsalSong(rehearsalId, songId);
         song.setNotes(dto.notes());
-        song.setRating(dto.duration());
+        song.setRating(dto.rating());
 
-        // Save directly to avoid Hibernate's INSERT-NULL-then-UPDATE pattern
-        // that violates the NOT NULL constraint on rehearsal_id
         return toSongResponse(saveRehearsal.saveSong(song));
     }
 
@@ -88,10 +81,9 @@ public class RehearsalApplicationService {
                 .orElseThrow(() -> new ResourceNotFoundException("RehearsalSong not found: " + songId));
 
         if (dto.notes() != null) song.setNotes(dto.notes());
-        if (dto.duration() != null) song.setRating(dto.duration());
+        if (dto.rating() != null) song.setRating(dto.rating());
 
-        saveRehearsal.save(r);
-        return toSongResponse(song);
+        return toSongResponse(saveRehearsal.saveSong(song));
     }
 
     @Transactional
@@ -110,15 +102,16 @@ public class RehearsalApplicationService {
         List<RehearsalSongResponse> songs = r.getSongs().stream()
                 .map(this::toSongResponse).toList();
         return new RehearsalResponse(
-                r.getId(), r.getBandId(), r.getDate(), r.getNotes(), r.getCreatedAt(), songs);
+                r.getId(), r.getDate(), r.getNotes(),
+                r.getCreatedAt().toString(), songs);
     }
 
     private RehearsalSongResponse toSongResponse(RehearsalSong s) {
-        String title = loadRehearsal.findLibrarySongTitle(s.getSongId());
+        String[] info = loadRehearsal.findLibrarySongInfo(s.getSongId());
+        Integer tempo = info[2] != null ? Integer.parseInt(info[2]) : null;
         return new RehearsalSongResponse(
-                s.getId(), s.getRehearsalId(), s.getSongId(),
-                title,
-                s.getRating(),
-                s.getNotes());
+                s.getId(), s.getSongId(),
+                info[0], info[1], tempo, info[3],
+                s.getNotes(), s.getRating());
     }
 }

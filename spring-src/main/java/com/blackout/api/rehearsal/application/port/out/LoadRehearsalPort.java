@@ -8,5 +8,6 @@ import java.util.Optional;
 public interface LoadRehearsalPort {
     List<Rehearsal> findAllByBandIdOrderByDateDesc(String bandId);
     Optional<Rehearsal> findByIdAndBandId(String id, String bandId);
-    String findLibrarySongTitle(String songId);
+    /** Returns [title, artist, tempo, style] or null values if not found */
+    String[] findLibrarySongInfo(String songId);
 }
