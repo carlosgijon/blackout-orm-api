@@ -5,7 +5,6 @@ import com.blackout.api.merch.application.port.out.LoadMerchPort;
 import com.blackout.api.merch.application.port.out.SaveMerchPort;
 import com.blackout.api.merch.domain.MerchItem;
 import com.blackout.api.merch.domain.MerchWaitingEntry;
-import com.blackout.api.merch.infrastructure.persistence.MerchPersistenceAdapter;
 import com.blackout.api.merch.infrastructure.web.dto.*;
 import com.blackout.api.shared.domain.BadRequestException;
 import com.blackout.api.shared.domain.ResourceNotFoundException;
@@ -20,15 +19,10 @@ public class MerchApplicationService {
 
     private final LoadMerchPort loadMerch;
     private final SaveMerchPort saveMerch;
-    private final MerchPersistenceAdapter persistenceAdapter;
 
-    public MerchApplicationService(
-            LoadMerchPort loadMerch,
-            SaveMerchPort saveMerch,
-            MerchPersistenceAdapter persistenceAdapter) {
+    public MerchApplicationService(LoadMerchPort loadMerch, SaveMerchPort saveMerch) {
         this.loadMerch = loadMerch;
         this.saveMerch = saveMerch;
-        this.persistenceAdapter = persistenceAdapter;
     }
 
     // ── MerchItem CRUD ────────────────────────────────────────────────────────
@@ -132,7 +126,7 @@ public class MerchApplicationService {
         Transaction t = new Transaction(bandId, "income", "merch_sales", amount, dto.date());
         t.setDescription(description);
         t.setGigId(dto.gigId());
-        Transaction savedTransaction = persistenceAdapter.saveTransaction(t);
+        Transaction savedTransaction = saveMerch.saveTransaction(t);
 
         TransactionSummary summary = new TransactionSummary(
                 savedTransaction.getId(), savedTransaction.getType(), savedTransaction.getCategory(),

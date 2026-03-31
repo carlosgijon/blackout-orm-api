@@ -1,5 +1,6 @@
 package com.blackout.api.merch.application.port.out;
 
+import com.blackout.api.finance.domain.Transaction;
 import com.blackout.api.merch.domain.MerchItem;
 import com.blackout.api.merch.domain.MerchWaitingEntry;
 
@@ -8,4 +9,5 @@ public interface SaveMerchPort {
     void deleteById(String id);
     MerchWaitingEntry saveWaiting(MerchWaitingEntry entry);
     void deleteWaitingById(String id);
+    Transaction saveTransaction(Transaction t);
 }
