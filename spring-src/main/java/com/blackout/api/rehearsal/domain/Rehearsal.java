@@ -1,6 +1,8 @@
 package com.blackout.api.rehearsal.domain;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import java.time.Instant;
 import java.util.*;
 
@@ -14,6 +16,7 @@ public class Rehearsal {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "rehearsal_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<RehearsalSong> songs = new ArrayList<>();
 
     protected Rehearsal() {}
