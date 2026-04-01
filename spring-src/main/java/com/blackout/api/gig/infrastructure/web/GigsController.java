@@ -42,7 +42,7 @@ public class GigsController {
         return service.update(auth.getBandId(), id, req);
     }
 
-    @PutMapping("/{id}/status")
+    @RequestMapping(value = "/{id}/status", method = {RequestMethod.PUT, RequestMethod.PATCH})
     public GigResponse updateStatus(@PathVariable String id,
                                      @RequestBody UpdateStatusRequest req,
                                      BlackoutAuthentication auth) {
@@ -50,7 +50,7 @@ public class GigsController {
         return service.updateStatus(auth.getBandId(), id, req.status());
     }
 
-    @PutMapping("/{id}/follow-up")
+    @RequestMapping(value = "/{id}/follow-up", method = {RequestMethod.PUT, RequestMethod.PATCH})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateFollowUp(@PathVariable String id,
                                 @RequestBody UpdateFollowUpRequest req,
