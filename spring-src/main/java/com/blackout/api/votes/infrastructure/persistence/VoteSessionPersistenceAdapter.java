@@ -4,6 +4,7 @@ import com.blackout.api.votes.application.port.out.LoadVoteSessionPort;
 import com.blackout.api.votes.application.port.out.SaveVoteSessionPort;
 import com.blackout.api.votes.domain.VoteSession;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -41,8 +42,10 @@ class VoteSessionPersistenceAdapter implements LoadVoteSessionPort, SaveVoteSess
     }
 
     @Override
+    @Transactional
     public void deleteById(String id) {
-        repo.deleteById(id);
+        repo.deleteVotesBySessionId(id);
+        repo.deleteSessionById(id);
     }
 
     @Override

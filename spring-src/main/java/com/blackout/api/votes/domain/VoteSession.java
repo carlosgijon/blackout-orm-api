@@ -15,6 +15,7 @@ public class VoteSession {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "session_id")
+    @org.hibernate.annotations.OnDelete(action = org.hibernate.annotations.OnDeleteAction.CASCADE)
     private List<Vote> votes = new ArrayList<>();
 
     protected VoteSession() {}
