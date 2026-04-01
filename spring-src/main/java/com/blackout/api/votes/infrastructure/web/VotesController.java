@@ -3,14 +3,13 @@ package com.blackout.api.votes.infrastructure.web;
 import com.blackout.api.shared.infrastructure.security.BlackoutAuthentication;
 import com.blackout.api.votes.application.service.VotesApplicationService;
 import com.blackout.api.votes.infrastructure.web.dto.*;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/votes")
+@RequestMapping("/vote-sessions")
 public class VotesController {
 
     private final VotesApplicationService service;
@@ -19,64 +18,63 @@ public class VotesController {
         this.service = service;
     }
 
-    @GetMapping("/{playlistId}/session")
+    @GetMapping
     public ResponseEntity<VoteSessionResponse> getSession(
             BlackoutAuthentication auth,
-            @PathVariable String playlistId
+            @RequestParam String playlistId
     ) {
         return service.getSession(auth.getBandId(), playlistId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.ok(null));
     }
 
-    @PostMapping("/{playlistId}/session")
+    @PostMapping
     public VoteSessionResponse createSession(
             BlackoutAuthentication auth,
-            @PathVariable String playlistId,
-            @Valid @RequestBody CreateSessionRequest request
+            @RequestBody CreateSessionRequest request
     ) {
-        return service.createSession(auth.getBandId(), playlistId, request.title());
+        return service.createSession(auth.getBandId(), request.playlistId(), request.title());
     }
 
-    @PostMapping("/sessions/{sessionId}/close")
+    @RequestMapping(value = "/{id}/close", method = {RequestMethod.PUT, RequestMethod.POST})
     public VoteSessionResponse closeSession(
             BlackoutAuthentication auth,
-            @PathVariable String sessionId
+            @PathVariable String id
     ) {
-        return service.closeSession(auth.getBandId(), sessionId);
+        return service.closeSession(auth.getBandId(), id);
     }
 
-    @PostMapping("/sessions/{sessionId}/reopen")
+    @RequestMapping(value = "/{id}/reopen", method = {RequestMethod.PUT, RequestMethod.POST})
     public VoteSessionResponse reopenSession(
             BlackoutAuthentication auth,
-            @PathVariable String sessionId
+            @PathVariable String id
     ) {
-        return service.reopenSession(auth.getBandId(), sessionId);
+        return service.reopenSession(auth.getBandId(), id);
     }
 
-    @DeleteMapping("/sessions/{sessionId}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSession(
             BlackoutAuthentication auth,
-            @PathVariable String sessionId
+            @PathVariable String id
     ) {
-        service.deleteSession(auth.getBandId(), sessionId);
+        service.deleteSession(auth.getBandId(), id);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/sessions/{sessionId}/cast")
+    @PostMapping("/{id}/votes")
     public VoteResponse castVote(
             BlackoutAuthentication auth,
-            @PathVariable String sessionId,
-            @Valid @RequestBody CastVoteRequest request
+            @PathVariable String id,
+            @RequestBody CastVoteRequest request
     ) {
-        return service.castVote(auth.getBandId(), sessionId, request.voterName(), request.orderedIds());
+        return service.castVote(auth.getBandId(), id, request.voterName(), request.orderedIds());
     }
 
-    @GetMapping("/sessions/{sessionId}/results")
+    @GetMapping("/{id}/results")
     public List<VoteResultEntry> getResults(
             BlackoutAuthentication auth,
-            @PathVariable String sessionId
+            @PathVariable String id
     ) {
-        return service.getResults(auth.getBandId(), sessionId);
+        return service.getResults(auth.getBandId(), id);
     }
 }
