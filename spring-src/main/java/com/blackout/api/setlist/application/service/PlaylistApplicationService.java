@@ -147,10 +147,15 @@ public class PlaylistApplicationService {
 
     @Transactional
     public void removeSong(String bandId, String playlistId, String entryId) {
-        // Load aggregate, apply domain method (removes + resequences in memory), cascade save
+        // Load to verify ownership, then delete via native SQL (avoids Hibernate SET NULL cascade)
         Playlist playlist = loadPlaylistWithSongs(bandId, playlistId);
-        playlist.removeEntry(entryId);
-        savePlaylist.save(playlist);
+        List<PlaylistSong> remaining = playlist.getSongs().stream()
+                .filter(s -> !s.getId().equals(entryId))
+                .sorted(java.util.Comparator.comparingInt(PlaylistSong::getPosition))
+                .collect(java.util.stream.Collectors.toList());
+        savePlaylist.deleteSongById(entryId); // native SQL + clearAutomatically
+        for (int i = 0; i < remaining.size(); i++) remaining.get(i).setPosition(i + 1);
+        savePlaylist.saveAllSongs(remaining);
     }
 
     @Transactional

@@ -61,5 +61,5 @@ public class PlaylistPersistenceAdapter implements LoadPlaylistPort, SavePlaylis
     @Override public List<PlaylistSong> saveAllSongs(List<PlaylistSong> entries) {
         return playlistSongs.saveAll(entries);
     }
-    @Override public void deleteSongById(String entryId) { playlistSongs.deleteById(entryId); }
+    @Override public void deleteSongById(String entryId) { playlistSongs.deleteByIdNative(entryId); }
 }

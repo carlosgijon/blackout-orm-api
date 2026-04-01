@@ -2,6 +2,7 @@ package com.blackout.api.setlist.infrastructure.persistence;
 
 import com.blackout.api.setlist.domain.PlaylistSong;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -36,4 +37,8 @@ interface JpaPlaylistSongRepository extends JpaRepository<PlaylistSong, String> 
         WHERE ps.songId = :songId
         """)
     List<String> findPlaylistNamesBySongId(@Param("songId") String songId);
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query(value = "DELETE FROM playlist_songs WHERE id = :id", nativeQuery = true)
+    void deleteByIdNative(@Param("id") String id);
 }
