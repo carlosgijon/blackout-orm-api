@@ -6,6 +6,7 @@ import com.blackout.api.settings.infrastructure.web.dto.SettingsResponse;
 import com.blackout.api.settings.infrastructure.web.dto.UpdateSettingsRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 @RestController
 @RequestMapping("/settings")
@@ -22,7 +23,7 @@ public class SettingsController {
         return service.getSettings(auth.getBandId());
     }
 
-    @PutMapping
+    @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST})
     public ResponseEntity<Void> updateSettings(
             BlackoutAuthentication auth,
             @RequestBody UpdateSettingsRequest request

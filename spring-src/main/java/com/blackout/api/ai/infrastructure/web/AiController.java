@@ -16,7 +16,7 @@ public class AiController {
         this.service = service;
     }
 
-    @PostMapping("/generate-setlist")
+    @PostMapping({"/generate-setlist", "/setlist"})
     public SetlistResult generateSetlist(@Valid @RequestBody GenerateSetlistRequest request) {
         return service.generateSetlist(request.songs(), request.preferences());
     }
