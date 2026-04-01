@@ -6,6 +6,7 @@ import com.blackout.api.shared.infrastructure.security.BlackoutAuthentication;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
 
@@ -67,8 +68,8 @@ public class MerchController {
         service.remove(auth.getBandId(), id);
     }
 
-    @PostMapping("/{id}/restock")
-    @PutMapping("/{id}/stock")
+    @RequestMapping(value = {"/{id}/restock", "/{id}/stock"},
+                    method = {RequestMethod.POST, RequestMethod.PUT})
     public MerchItemResponse restock(
             BlackoutAuthentication auth,
             @PathVariable String id,
