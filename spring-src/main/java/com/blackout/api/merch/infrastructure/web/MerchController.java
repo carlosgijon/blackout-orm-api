@@ -68,6 +68,7 @@ public class MerchController {
     }
 
     @PostMapping("/{id}/restock")
+    @PutMapping("/{id}/stock")
     public MerchItemResponse restock(
             BlackoutAuthentication auth,
             @PathVariable String id,
