@@ -140,7 +140,7 @@ public class GigApplicationService {
 
     @Transactional
     public void removeContact(String bandId, String gigId, String contactId) {
-        findOwned(bandId, gigId);
+        if (gigId != null) findOwned(bandId, gigId);
         saveGig.deleteContact(contactId);
     }
 
