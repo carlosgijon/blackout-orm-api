@@ -35,6 +35,7 @@ model Band {
   merchWaitingList  MerchWaitingEntry[]
   rehearsals        Rehearsal[]
   voteSessions   VoteSession[]
+  polls          Poll[]
 
   @@map("bands")
 }
@@ -308,6 +309,7 @@ model Gig {
   contacts     GigContact[]
   checklists   GigChecklist[]
   transactions Transaction[]
+  polls        Poll[]
 
   @@map("gigs")
 }
@@ -515,4 +517,57 @@ model Vote {
 
   @@unique([sessionId, voterName])
   @@map("votes")
+}
+
+// ── Free Polls ───────────────────────────────────────────────────────────────
+
+model Poll {
+  id          String    @id @default(uuid())
+  bandId      String    @map("band_id")
+  title       String
+  description String?
+  // "yes_no" | "approval" | "proposal"
+  type        String
+  // "draft" | "open" | "closed" | "archived"
+  status      String    @default("draft")
+  createdBy   String    @map("created_by")
+  deadline    DateTime?
+  linkedGigId String?   @map("linked_gig_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  band    Band         @relation(fields: [bandId], references: [id], onDelete: Cascade)
+  gig     Gig?         @relation(fields: [linkedGigId], references: [id], onDelete: SetNull)
+  options PollOption[]
+  votes   PollVote[]
+
+  @@map("polls")
+}
+
+model PollOption {
+  id         String   @id @default(uuid())
+  pollId     String   @map("poll_id")
+  text       String
+  proposedBy String?  @map("proposed_by")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  poll  Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  votes PollVote[]
+
+  @@map("poll_options")
+}
+
+model PollVote {
+  id        String   @id @default(uuid())
+  pollId    String   @map("poll_id")
+  optionId  String?  @map("option_id")
+  voterName String   @map("voter_name")
+  // yes_no: "yes"|"no"|"abstain"  |  approval/proposal: "approve"
+  value     String
+  comment   String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  poll   Poll        @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  option PollOption? @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@map("poll_votes")
 }

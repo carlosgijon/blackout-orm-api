@@ -17,6 +17,7 @@ import { MerchModule } from './merch/merch.module';
 import { AiModule } from './ai/ai.module';
 import { RehearsalsModule } from './rehearsals/rehearsals.module';
 import { VotesModule } from './votes/votes.module';
+import { PollsModule } from './polls/polls.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { VotesModule } from './votes/votes.module';
     AiModule,
     RehearsalsModule,
     VotesModule,
+    PollsModule,
   ],
 })
 export class AppModule {}
