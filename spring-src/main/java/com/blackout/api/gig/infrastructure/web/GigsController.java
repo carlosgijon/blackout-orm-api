@@ -92,13 +92,21 @@ public class GigsController {
         return service.createContact(auth.getBandId(), gigId, req);
     }
 
-    @DeleteMapping({"/{gigId}/contacts/{contactId}", "/contacts/{contactId}"})
+    @DeleteMapping("/{gigId}/contacts/{contactId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeContact(@PathVariable(required = false) String gigId,
+    public void removeContact(@PathVariable String gigId,
                                @PathVariable String contactId,
                                BlackoutAuthentication auth) {
         requireBand(auth);
         service.removeContact(auth.getBandId(), gigId, contactId);
+    }
+
+    @DeleteMapping("/contacts/{contactId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeContactById(@PathVariable String contactId,
+                                   BlackoutAuthentication auth) {
+        requireBand(auth);
+        service.removeContact(auth.getBandId(), null, contactId);
     }
 
     // ── Checklists ───────────────────────────────────────────────────────────
