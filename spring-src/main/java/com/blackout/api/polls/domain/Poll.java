@@ -31,8 +31,7 @@ public class Poll {
     @Column(name = "created_by", nullable = false)
     private String createdBy;
 
-    /** YYYY-MM-DD or null */
-    private String deadline;
+    private Instant deadline;
 
     @Column(name = "linked_gig_id")
     private String linkedGigId;
@@ -69,8 +68,8 @@ public class Poll {
     public String getStatus()      { return status; }
     public void   setStatus(String s) { status = s; }
     public String getCreatedBy()   { return createdBy; }
-    public String getDeadline()    { return deadline; }
-    public void   setDeadline(String d) { deadline = d; }
+    public Instant getDeadline()    { return deadline; }
+    public void   setDeadline(Instant d) { deadline = d; }
     public String getLinkedGigId() { return linkedGigId; }
     public void   setLinkedGigId(String g) { linkedGigId = g; }
     public Instant getCreatedAt()  { return createdAt; }

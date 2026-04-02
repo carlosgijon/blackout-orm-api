@@ -49,7 +49,7 @@ public class PollApplicationService {
         }
         Poll poll = new Poll(bandId, req.title(), req.type(), req.createdBy());
         poll.setDescription(req.description());
-        poll.setDeadline(req.deadline());
+        if (req.deadline() != null && !req.deadline().isBlank()) poll.setDeadline(java.time.Instant.parse(req.deadline()));
         poll.setLinkedGigId(req.linkedGigId());
 
         if (req.options() != null) {

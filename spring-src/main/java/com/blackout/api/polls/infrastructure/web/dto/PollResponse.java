@@ -11,7 +11,7 @@ public record PollResponse(
         String type,
         String status,
         String createdBy,
-        String deadline,
+        Instant deadline,
         String linkedGigId,
         Instant createdAt,
         List<PollOptionResponse> options,
