@@ -20,4 +20,16 @@ jobs:
             cd ~/blackout-orm-api
             git pull
             docker compose up --build -d
-            echo "✓ Backend deployed"
+            echo "→ Waiting for Spring to be healthy..."
+            for i in $(seq 1 30); do
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3002/actuator/health)
+              if [ "$STATUS" = "200" ]; then
+                echo "→ Spring healthy, reloading nginx..."
+                docker compose restart nginx
+                echo "✓ Backend deployed"
+                exit 0
+              fi
+              sleep 3
+            done
+            echo "✗ Spring did not become healthy in time"
+            exit 1
