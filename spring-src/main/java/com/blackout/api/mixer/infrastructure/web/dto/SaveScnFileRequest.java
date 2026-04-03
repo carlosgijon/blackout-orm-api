@@ -7,5 +7,5 @@ public record SaveScnFileRequest(
         @NotBlank String content,
         String notes,
         String gigId,
-        String venue
+        String venueId
 ) {}

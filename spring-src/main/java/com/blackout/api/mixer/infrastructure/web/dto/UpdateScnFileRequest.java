@@ -4,5 +4,5 @@ public record UpdateScnFileRequest(
         String name,
         String notes,
         String gigId,
-        String venue
+        String venueId
 ) {}
