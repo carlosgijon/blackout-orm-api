@@ -38,7 +38,7 @@ spring:
       enabled: true
 
 server:
-  port: ${SERVER_PORT:3001}
+  port: 3002
   error:
     include-message: never
     include-stacktrace: never
