@@ -1,42 +1,45 @@
 # ── Stage 1: Build ────────────────────────────────────────────────────────────
-FROM node:20-alpine AS builder
+FROM eclipse-temurin:21-jdk-alpine AS builder
 
-WORKDIR /app
+WORKDIR /build
 
-# Install dependencies first (layer cache)
-COPY package*.json ./
-COPY prisma ./prisma/
-RUN npm ci
+# Copy only pom.xml first for dependency layer cache
+COPY pom.xml .
 
-# Generate Prisma client
-RUN npx prisma generate
+# Download dependencies (cached unless pom.xml changes)
+RUN --mount=type=cache,target=/root/.m2 \
+    mvn -f pom.xml dependency:go-offline -B --quiet 2>/dev/null || true
 
-# Build TypeScript
-COPY . .
-RUN npm run build
+# Download Maven wrapper or use system Maven
+# Alpine eclipse-temurin doesn't include Maven — install it
+RUN apk add --no-cache maven
 
-# ── Stage 2: Production runtime ───────────────────────────────────────────────
-FROM node:20-alpine AS runner
+# Re-download with correct Maven
+RUN mvn -f pom.xml dependency:go-offline -B --quiet 2>/dev/null || true
 
-# Prisma needs openssl on Alpine
-RUN apk add --no-cache openssl
+# Copy source
+COPY spring-src ./spring-src
 
-WORKDIR /app
+# Build (skip tests in Docker build — run in CI)
+RUN mvn -f pom.xml package -DskipTests -B
 
-# Create non-root user
+# ── Stage 2: Runtime ──────────────────────────────────────────────────────────
+FROM eclipse-temurin:21-jre-alpine AS runner
+
+# Non-root user
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
-# Install only production dependencies
-COPY package*.json ./
-COPY prisma ./prisma/
-RUN npm ci --omit=dev && npx prisma generate
+WORKDIR /app
 
-# Copy compiled app
-COPY --from=builder /app/dist ./dist
+# Copy the fat jar
+COPY --from=builder /build/target/blackout-api-*.jar app.jar
 
+RUN chown appuser:appgroup app.jar
 USER appuser
 
 EXPOSE 3001
 
-# Run migrations then start the app
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/main"]
+# JVM tuning for containers: virtual threads, small footprint
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75 -Djava.security.egd=file:/dev/./urandom"
+
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
