@@ -1,8 +1,7 @@
 package com.blackout.api.polls.domain;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.BatchSize;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,15 +40,16 @@ public class Poll {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "poll_id")
     @OrderBy("createdAt ASC")
+    @BatchSize(size = 50)
     private List<PollOption> options = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "poll_id")
     @OrderBy("createdAt ASC")
-    @Fetch(FetchMode.SUBSELECT)
+    @BatchSize(size = 50)
     private List<PollVote> votes = new ArrayList<>();
 
     protected Poll() {}
