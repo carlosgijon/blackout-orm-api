@@ -1,6 +1,8 @@
 package com.blackout.api.polls.domain;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +49,7 @@ public class Poll {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "poll_id")
     @OrderBy("createdAt ASC")
+    @Fetch(FetchMode.SUBSELECT)
     private List<PollVote> votes = new ArrayList<>();
 
     protected Poll() {}
