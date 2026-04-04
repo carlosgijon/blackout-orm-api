@@ -10,26 +10,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to VPS
+      - name: Deploy backend to VPS
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
+            set -e
             cd ~/blackout-orm-api
-            git pull
-            docker compose up --build -d
-            echo "→ Waiting for Spring to be healthy..."
+            git pull origin main
+
+            # Rebuild and restart only spring-api; clean up orphan containers
+            docker compose up --build -d --remove-orphans spring-api
+
+            # Wait for Spring to be healthy (max 90 s)
+            echo "→ Waiting for Spring..."
             for i in $(seq 1 30); do
-              STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3002/actuator/health)
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3002/actuator/health 2>/dev/null || echo "000")
               if [ "$STATUS" = "200" ]; then
                 echo "→ Spring healthy, reloading nginx..."
                 docker compose restart nginx
-                echo "✓ Backend deployed"
+                echo "✓ Backend deployed at $(date)"
                 exit 0
               fi
               sleep 3
             done
-            echo "✗ Spring did not become healthy in time"
+            echo "✗ Spring did not become healthy — last status: $STATUS"
+            docker compose logs spring-api --tail=30
             exit 1
