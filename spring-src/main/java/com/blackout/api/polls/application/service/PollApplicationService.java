@@ -49,7 +49,15 @@ public class PollApplicationService {
         }
         Poll poll = new Poll(bandId, req.title(), req.type(), req.createdBy());
         poll.setDescription(req.description());
-        if (req.deadline() != null && !req.deadline().isBlank()) poll.setDeadline(java.time.Instant.parse(req.deadline()));
+        if (req.deadline() != null && !req.deadline().isBlank()) {
+            try {
+                poll.setDeadline(java.time.Instant.parse(req.deadline()));
+            } catch (java.time.format.DateTimeParseException e) {
+                // Frontend date-only input sends YYYY-MM-DD → treat as midnight UTC
+                poll.setDeadline(java.time.LocalDate.parse(req.deadline())
+                        .atStartOfDay(java.time.ZoneOffset.UTC).toInstant());
+            }
+        }
         poll.setLinkedGigId(req.linkedGigId());
 
         if (req.options() != null) {
