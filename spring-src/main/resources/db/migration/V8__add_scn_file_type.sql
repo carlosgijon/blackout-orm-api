@@ -1,0 +1,1 @@
+ALTER TABLE scn_files ADD COLUMN type TEXT NOT NULL DEFAULT 'general';

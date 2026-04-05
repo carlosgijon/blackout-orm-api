@@ -27,6 +27,9 @@ public class ScnFile {
     @Column(name = "venue_id")
     private String venueId;
 
+    @Column(nullable = false)
+    private String type = "general";
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
@@ -53,6 +56,8 @@ public class ScnFile {
     public void    setGigId(String g) { gigId = g; }
     public String  getVenueId()   { return venueId; }
     public void    setVenueId(String v) { venueId = v; }
+    public String  getType()      { return type; }
+    public void    setType(String t) { type = t; }
     public Instant getCreatedAt() { return createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
     public void    setUpdatedAt(Instant t) { updatedAt = t; }

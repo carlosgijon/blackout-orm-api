@@ -10,6 +10,7 @@ public record ScnFileResponse(
         String notes,
         String gigId,
         String venueId,
+        String type,
         Instant createdAt,
         Instant updatedAt
 ) {}

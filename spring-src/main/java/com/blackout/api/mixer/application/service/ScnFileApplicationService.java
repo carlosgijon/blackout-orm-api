@@ -39,6 +39,7 @@ public class ScnFileApplicationService {
         file.setNotes(req.notes());
         file.setGigId(req.gigId());
         file.setVenueId(req.venueId());
+        if (req.type() != null) file.setType(req.type());
         return toResponse(save.save(file));
     }
 
@@ -49,6 +50,7 @@ public class ScnFileApplicationService {
         if (req.notes() != null) file.setNotes(req.notes());
         file.setGigId(req.gigId());
         file.setVenueId(req.venueId());
+        if (req.type()  != null) file.setType(req.type());
         file.setUpdatedAt(Instant.now());
         return toResponse(save.save(file));
     }
@@ -67,7 +69,7 @@ public class ScnFileApplicationService {
     private ScnFileResponse toResponse(ScnFile f) {
         return new ScnFileResponse(
                 f.getId(), f.getBandId(), f.getName(), f.getContent(),
-                f.getNotes(), f.getGigId(), f.getVenueId(),
+                f.getNotes(), f.getGigId(), f.getVenueId(), f.getType(),
                 f.getCreatedAt(), f.getUpdatedAt());
     }
 }
