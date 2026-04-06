@@ -38,6 +38,7 @@ public class RehearsalApplicationService {
     public RehearsalResponse create(String bandId, CreateRehearsalRequest dto) {
         Rehearsal r = new Rehearsal(bandId, dto.date());
         r.setNotes(dto.notes());
+        if (dto.status() != null) r.setStatus(dto.status());
         return toResponse(saveRehearsal.save(r));
     }
 
@@ -47,6 +48,7 @@ public class RehearsalApplicationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Rehearsal not found: " + id));
         if (dto.date() != null) r.setDate(dto.date());
         if (dto.notes() != null) r.setNotes(dto.notes());
+        if (dto.status() != null) r.setStatus(dto.status());
         return toResponse(saveRehearsal.save(r));
     }
 
@@ -102,7 +104,7 @@ public class RehearsalApplicationService {
         List<RehearsalSongResponse> songs = r.getSongs().stream()
                 .map(this::toSongResponse).toList();
         return new RehearsalResponse(
-                r.getId(), r.getDate(), r.getNotes(),
+                r.getId(), r.getDate(), r.getNotes(), r.getStatus(),
                 r.getCreatedAt().toString(), songs);
     }
 

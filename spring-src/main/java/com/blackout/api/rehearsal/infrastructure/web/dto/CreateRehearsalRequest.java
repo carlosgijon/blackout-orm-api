@@ -4,5 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 
 public record CreateRehearsalRequest(
         @NotBlank String date,
-        String notes
+        String notes,
+        String status
 ) {}
