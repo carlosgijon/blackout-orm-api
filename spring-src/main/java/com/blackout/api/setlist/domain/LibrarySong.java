@@ -30,6 +30,8 @@ public class LibrarySong {
     @Column(name = "end_note")
     private String endNote;
 
+    private String status = "READY";
+
     protected LibrarySong() {}
 
     public LibrarySong(String bandId, String title, String artist) {
@@ -58,4 +60,6 @@ public class LibrarySong {
     public void setStartNote(String startNote) { this.startNote = startNote; }
     public String getEndNote() { return endNote; }
     public void setEndNote(String endNote) { this.endNote = endNote; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

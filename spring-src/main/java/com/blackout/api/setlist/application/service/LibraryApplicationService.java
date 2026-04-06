@@ -44,6 +44,7 @@ public class LibraryApplicationService {
         song.setNotes(req.notes());
         song.setStartNote(req.startNote());
         song.setEndNote(req.endNote());
+        if (req.status() != null) song.setStatus(req.status());
         return LibrarySongResponse.from(saveSong.save(song));
     }
 
@@ -59,6 +60,7 @@ public class LibraryApplicationService {
         song.setNotes(req.notes());
         song.setStartNote(req.startNote());
         song.setEndNote(req.endNote());
+        if (req.status() != null) song.setStatus(req.status());
         return LibrarySongResponse.from(saveSong.save(song));
     }
 
