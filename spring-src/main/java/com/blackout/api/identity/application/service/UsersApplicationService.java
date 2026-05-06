@@ -33,8 +33,8 @@ public class UsersApplicationService {
 
     @Transactional
     public UserResponse create(String bandId, CreateUserRequest req) {
-        if (loadUser.existsByUsername(req.username()))
-            throw new ConflictException("El usuario \"" + req.username() + "\" ya existe");
+        if (loadUser.existsByUsernameAndBandId(req.username(), bandId))
+            throw new ConflictException("El usuario \"" + req.username() + "\" ya existe en este grupo");
 
         String hash = BCrypt.withDefaults().hashToString(10, req.password().toCharArray());
         User user = new User(req.username(), hash, req.role());
@@ -50,8 +50,8 @@ public class UsersApplicationService {
         User user = findOwnedUser(bandId, id);
 
         if (req.username() != null && !req.username().equals(user.getUsername())) {
-            if (loadUser.existsByUsername(req.username()))
-                throw new ConflictException("El usuario \"" + req.username() + "\" ya existe");
+            if (loadUser.existsByUsernameAndBandId(req.username(), bandId))
+                throw new ConflictException("El usuario \"" + req.username() + "\" ya existe en este grupo");
             user.setUsername(req.username());
         }
         if (req.displayName() != null) user.setDisplayName(req.displayName());

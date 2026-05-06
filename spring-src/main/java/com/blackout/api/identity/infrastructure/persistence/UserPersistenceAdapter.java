@@ -24,6 +24,7 @@ public class UserPersistenceAdapter implements LoadUserPort, SaveUserPort, LoadU
     @Override public Optional<User> findByUsername(String username) { return users.findByUsername(username); }
     @Override public List<User> findAllByBandId(String bandId) { return users.findAllByBandIdOrderByCreatedAtAsc(bandId); }
     @Override public boolean existsByUsername(String username) { return users.existsByUsername(username); }
+    @Override public boolean existsByUsernameAndBandId(String username, String bandId) { return users.existsByUsernameAndBandId(username, bandId); }
 
     // SaveUserPort
     @Override public User save(User user) { return users.save(user); }

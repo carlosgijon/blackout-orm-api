@@ -9,4 +9,5 @@ public interface LoadUserPort {
     Optional<User> findByUsername(String username);
     List<User> findAllByBandId(String bandId);
     boolean existsByUsername(String username);
+    boolean existsByUsernameAndBandId(String username, String bandId);
 }

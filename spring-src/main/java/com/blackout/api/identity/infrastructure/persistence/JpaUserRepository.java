@@ -11,4 +11,5 @@ interface JpaUserRepository extends JpaRepository<User, String> {
     Optional<User> findByUsername(String username);
     List<User> findAllByBandIdOrderByCreatedAtAsc(String bandId);
     boolean existsByUsername(String username);
+    boolean existsByUsernameAndBandId(String username, String bandId);
 }
