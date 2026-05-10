@@ -364,11 +364,12 @@ public class EquipmentApplicationService {
             }
         }
 
-        // Drum usage labels
-        Map<String, String> drumUsageLabel = Map.of(
+        // Mic usage labels for reports
+        Map<String, String> micUsageLabels = Map.of(
                 "drums-kick", "Bombo",
                 "drums-overhead", "A\u00e9reos",
-                "drums-snare", "Caja");
+                "drums-snare", "Caja",
+                "vocal-headset", "Diadema");
 
         // Instruments
         for (Instrument inst : instruments) {
@@ -396,7 +397,7 @@ public class EquipmentApplicationService {
             } else {
                 for (Microphone mic : instMics) {
                     String suffix = instMics.size() > 1
-                            ? drumUsageLabel.getOrDefault(mic.getUsage(), inst.getName())
+                            ? micUsageLabels.getOrDefault(mic.getUsage(), inst.getName())
                             : inst.getName();
                     String entryName = memberName != null
                             ? memberName + " \u2013 " + suffix
