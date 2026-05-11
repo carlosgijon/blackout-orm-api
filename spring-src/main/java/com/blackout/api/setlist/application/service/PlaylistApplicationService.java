@@ -21,13 +21,16 @@ public class PlaylistApplicationService {
     private final LoadPlaylistPort loadPlaylist;
     private final SavePlaylistPort savePlaylist;
     private final LoadLibrarySongPort loadSong;
+    private final SaveLibrarySongPort saveSong;
 
     public PlaylistApplicationService(LoadPlaylistPort loadPlaylist,
                                        SavePlaylistPort savePlaylist,
-                                       LoadLibrarySongPort loadSong) {
+                                       LoadLibrarySongPort loadSong,
+                                       SaveLibrarySongPort saveSong) {
         this.loadPlaylist = loadPlaylist;
         this.savePlaylist = savePlaylist;
         this.loadSong = loadSong;
+        this.saveSong = saveSong;
     }
 
     public List<PlaylistSummaryResponse> findAll(String bandId) {
@@ -107,9 +110,33 @@ public class PlaylistApplicationService {
         findOwned(bandId, playlistId);
         int lastPos = loadPlaylist.countSongsByPlaylistId(playlistId);
 
+        String songId = req.songId();
+        // If type is "song" but no songId provided, create one in library automatically
+        if ("song".equals(req.type()) && songId == null) {
+            LibrarySong ls = new LibrarySong(bandId, req.title(), req.artist() != null ? req.artist() : "Desconocido");
+            ls.setAlbum(req.album());
+            ls.setDuration(req.duration());
+            ls.setTempo(req.tempo());
+            ls.setStyle(req.style());
+            ls.setNotes(req.notes());
+            songId = saveSong.save(ls).getId();
+        } else if (songId != null) {
+            // Update existing library song metadata if provided
+            loadSong.findByIdAndBandId(songId, bandId).ifPresent(ls -> {
+                ls.setTitle(req.title());
+                if (req.artist() != null) ls.setArtist(req.artist());
+                ls.setAlbum(req.album());
+                ls.setDuration(req.duration());
+                ls.setTempo(req.tempo());
+                ls.setStyle(req.style());
+                ls.setNotes(req.notes());
+                saveSong.save(ls);
+            });
+        }
+
         PlaylistSong entry = new PlaylistSong();
         entry.setPlaylistId(playlistId);
-        entry.setSongId(req.songId());
+        entry.setSongId(songId);
         entry.setPosition(lastPos);
         entry.setType(req.type() != null ? req.type() : "song");
         entry.setTitle(req.title());
@@ -137,6 +164,20 @@ public class PlaylistApplicationService {
         entry.setTitle(req.title());
         entry.setSetlistName(req.setlistName());
         entry.setJoinWithNext(req.joinWithNext());
+
+        // Update library song metadata if linked
+        if (entry.getSongId() != null) {
+            loadSong.findByIdAndBandId(entry.getSongId(), bandId).ifPresent(ls -> {
+                ls.setTitle(req.title());
+                if (req.artist() != null) ls.setArtist(req.artist());
+                ls.setAlbum(req.album());
+                ls.setDuration(req.duration());
+                ls.setTempo(req.tempo());
+                ls.setStyle(req.style());
+                ls.setNotes(req.notes());
+                saveSong.save(ls);
+            });
+        }
 
         PlaylistSong saved = savePlaylist.saveSong(entry);
         LibrarySong ls = saved.getSongId() != null
