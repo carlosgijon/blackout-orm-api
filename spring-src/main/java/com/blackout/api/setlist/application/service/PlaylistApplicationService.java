@@ -1,18 +1,31 @@
 package com.blackout.api.setlist.application.service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.blackout.api.setlist.application.port.out.LoadLibrarySongPort;
 import com.blackout.api.setlist.application.port.out.LoadPlaylistPort;
+import com.blackout.api.setlist.application.port.out.SaveLibrarySongPort;
 import com.blackout.api.setlist.application.port.out.SavePlaylistPort;
 import com.blackout.api.setlist.domain.LibrarySong;
 import com.blackout.api.setlist.domain.Playlist;
 import com.blackout.api.setlist.domain.PlaylistSong;
-import com.blackout.api.setlist.infrastructure.web.dto.*;
+import com.blackout.api.setlist.infrastructure.web.dto.AddSongRequest;
+import com.blackout.api.setlist.infrastructure.web.dto.CreatePlaylistRequest;
+import com.blackout.api.setlist.infrastructure.web.dto.PlaylistGigSummary;
+import com.blackout.api.setlist.infrastructure.web.dto.PlaylistResponse;
+import com.blackout.api.setlist.infrastructure.web.dto.PlaylistSongView;
+import com.blackout.api.setlist.infrastructure.web.dto.PlaylistSummaryResponse;
+import com.blackout.api.setlist.infrastructure.web.dto.UpdatePlaylistRequest;
+import com.blackout.api.setlist.infrastructure.web.dto.UpdateSongRequest;
 import com.blackout.api.shared.domain.ResourceNotFoundException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -24,9 +37,9 @@ public class PlaylistApplicationService {
     private final SaveLibrarySongPort saveSong;
 
     public PlaylistApplicationService(LoadPlaylistPort loadPlaylist,
-                                       SavePlaylistPort savePlaylist,
-                                       LoadLibrarySongPort loadSong,
-                                       SaveLibrarySongPort saveSong) {
+            SavePlaylistPort savePlaylist,
+            LoadLibrarySongPort loadSong,
+            SaveLibrarySongPort saveSong) {
         this.loadPlaylist = loadPlaylist;
         this.savePlaylist = savePlaylist;
         this.loadSong = loadSong;
@@ -47,24 +60,23 @@ public class PlaylistApplicationService {
 
             // Collect all songIds, load library songs in batch
             List<String> songIds = songs.stream()
-                .map(PlaylistSong::getSongId)
-                .filter(Objects::nonNull)
-                .toList();
+                    .map(PlaylistSong::getSongId)
+                    .filter(Objects::nonNull)
+                    .toList();
             if (!songIds.isEmpty()) {
                 int dur = loadSong.findAllById(songIds).stream()
-                    .mapToInt(ls -> ls.getDuration() != null ? ls.getDuration() : 0)
-                    .sum();
+                        .mapToInt(ls -> ls.getDuration() != null ? ls.getDuration() : 0)
+                        .sum();
                 durationMap.put(p.getId(), dur);
             }
         }
 
         return playlists.stream()
-            .map(p -> new PlaylistSummaryResponse(
-                p.getId(), p.getName(), p.getDescription(), p.getCreatedAt(),
-                songCountMap.getOrDefault(p.getId(), 0),
-                durationMap.getOrDefault(p.getId(), 0)
-            ))
-            .toList();
+                .map(p -> new PlaylistSummaryResponse(
+                        p.getId(), p.getName(), p.getDescription(), p.getCreatedAt(),
+                        songCountMap.getOrDefault(p.getId(), 0),
+                        durationMap.getOrDefault(p.getId(), 0)))
+                .toList();
     }
 
     @Transactional
@@ -94,15 +106,15 @@ public class PlaylistApplicationService {
 
         // Batch-load library songs in 1 query (no N+1)
         Set<String> songIds = entries.stream()
-            .map(PlaylistSong::getSongId)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toSet());
+                .map(PlaylistSong::getSongId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
         Map<String, LibrarySong> songMap = loadSong.findAllById(songIds).stream()
-            .collect(Collectors.toMap(LibrarySong::getId, s -> s));
+                .collect(Collectors.toMap(LibrarySong::getId, s -> s));
 
         return entries.stream()
-            .map(ps -> PlaylistSongView.from(ps, songMap.get(ps.getSongId())))
-            .toList();
+                .map(ps -> PlaylistSongView.from(ps, songMap.get(ps.getSongId())))
+                .toList();
     }
 
     @Transactional
@@ -124,7 +136,8 @@ public class PlaylistApplicationService {
             // Update existing library song metadata if provided
             loadSong.findByIdAndBandId(songId, bandId).ifPresent(ls -> {
                 ls.setTitle(req.title());
-                if (req.artist() != null) ls.setArtist(req.artist());
+                if (req.artist() != null)
+                    ls.setArtist(req.artist());
                 ls.setAlbum(req.album());
                 ls.setDuration(req.duration());
                 ls.setTempo(req.tempo());
@@ -145,20 +158,20 @@ public class PlaylistApplicationService {
 
         PlaylistSong saved = savePlaylist.saveSong(entry);
         LibrarySong ls = saved.getSongId() != null
-            ? loadSong.findAllById(List.of(saved.getSongId())).stream().findFirst().orElse(null)
-            : null;
+                ? loadSong.findAllById(List.of(saved.getSongId())).stream().findFirst().orElse(null)
+                : null;
         return PlaylistSongView.from(saved, ls);
     }
 
     @Transactional
     public PlaylistSongView updateSong(String bandId, String playlistId,
-                                        String entryId, UpdateSongRequest req) {
+            String entryId, UpdateSongRequest req) {
         findOwned(bandId, playlistId);
         List<PlaylistSong> songs = loadPlaylist.findSongsByPlaylistId(playlistId);
         PlaylistSong entry = songs.stream()
-            .filter(s -> s.getId().equals(entryId))
-            .findFirst()
-            .orElseThrow(() -> new ResourceNotFoundException("Entry not found"));
+                .filter(s -> s.getId().equals(entryId))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Entry not found"));
 
         entry.setType(req.type());
         entry.setTitle(req.title());
@@ -169,7 +182,8 @@ public class PlaylistApplicationService {
         if (entry.getSongId() != null) {
             loadSong.findByIdAndBandId(entry.getSongId(), bandId).ifPresent(ls -> {
                 ls.setTitle(req.title());
-                if (req.artist() != null) ls.setArtist(req.artist());
+                if (req.artist() != null)
+                    ls.setArtist(req.artist());
                 ls.setAlbum(req.album());
                 ls.setDuration(req.duration());
                 ls.setTempo(req.tempo());
@@ -181,21 +195,23 @@ public class PlaylistApplicationService {
 
         PlaylistSong saved = savePlaylist.saveSong(entry);
         LibrarySong ls = saved.getSongId() != null
-            ? loadSong.findAllById(List.of(saved.getSongId())).stream().findFirst().orElse(null)
-            : null;
+                ? loadSong.findAllById(List.of(saved.getSongId())).stream().findFirst().orElse(null)
+                : null;
         return PlaylistSongView.from(saved, ls);
     }
 
     @Transactional
     public void removeSong(String bandId, String playlistId, String entryId) {
-        // Load to verify ownership, then delete via native SQL (avoids Hibernate SET NULL cascade)
+        // Load to verify ownership, then delete via native SQL (avoids Hibernate SET
+        // NULL cascade)
         Playlist playlist = loadPlaylistWithSongs(bandId, playlistId);
         List<PlaylistSong> remaining = playlist.getSongs().stream()
                 .filter(s -> !s.getId().equals(entryId))
                 .sorted(java.util.Comparator.comparingInt(PlaylistSong::getPosition))
                 .collect(java.util.stream.Collectors.toList());
         savePlaylist.deleteSongById(entryId); // native SQL + clearAutomatically
-        for (int i = 0; i < remaining.size(); i++) remaining.get(i).setPosition(i + 1);
+        for (int i = 0; i < remaining.size(); i++)
+            remaining.get(i).setPosition(i + 1);
         savePlaylist.saveAllSongs(remaining);
     }
 
@@ -211,8 +227,8 @@ public class PlaylistApplicationService {
     public List<PlaylistGigSummary> getGigs(String bandId, String playlistId) {
         findOwned(bandId, playlistId);
         return loadPlaylist.findGigsByPlaylistId(bandId, playlistId).stream()
-            .map(g -> new PlaylistGigSummary(g.id(), g.title(), g.date(), g.status(), g.venueName()))
-            .toList();
+                .map(g -> new PlaylistGigSummary(g.id(), g.title(), g.date(), g.status(), g.venueName()))
+                .toList();
     }
 
     private Playlist loadPlaylistWithSongs(String bandId, String playlistId) {
@@ -224,6 +240,6 @@ public class PlaylistApplicationService {
 
     private Playlist findOwned(String bandId, String id) {
         return loadPlaylist.findByIdAndBandId(id, bandId)
-            .orElseThrow(() -> new ResourceNotFoundException("Playlist not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Playlist not found"));
     }
 }
